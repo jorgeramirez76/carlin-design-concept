@@ -96,6 +96,17 @@ p{margin:0}
 .chap.on{color:#f5f5f7}
 @media (max-width:560px){.bench{grid-template-columns:1fr}.controls{order:-1}.chapters{gap:8px}.chap{font-size:12px}}
 
+
+/* craft film */
+.craft{background:var(--stage);color:var(--stage-fg);padding-block:90px 70px}
+.craft h2{font-size:clamp(34px,5vw,56px);font-weight:700;line-height:1.05;margin-top:10px;max-width:18ch}
+.craft .eyebrow{color:var(--gold-soft)}
+.craft .lead{color:#a1a1a6;font-size:19px;margin-top:16px;max-width:52ch}
+.craft-video{width:100%;aspect-ratio:16/9;border-radius:24px;margin-top:40px;background:#111;object-fit:cover}
+.craft-frame{position:relative}
+.sound-btn{position:absolute;right:38px;bottom:62px;z-index:2;background:rgba(0,0,0,.45);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.craft-note{font-size:13px;color:#86868b;margin-top:12px}
+
 /* statement */
 .statement{padding-block:120px 40px}
 .statement p{font-size:clamp(28px,4.4vw,48px);line-height:1.12;font-weight:600;letter-spacing:-.028em;max-width:22ch}
@@ -219,6 +230,17 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   </div>
 </header>
 
+
+<section class="craft" aria-label="Hand engraving at the bench">
+  <div class="wrap">
+    <div class="eyebrow">By hand</div>
+    <h2>Every line is pushed through the gold by hand.</h2>
+    <p class="lead">A hardened steel graver, a steady palm and a vise that turns the ring into each cut. The metal peels away in tiny gold curls.</p>
+  </div>
+  <div class="wrap craft-frame"><button class="icon-btn sound-btn" id="sound" type="button" aria-label="Turn sound on"><svg viewBox="0 0 16 16"><path d="M2 6h2.5L8 3v10L4.5 10H2z"/><path id="snd-waves" d="M10.5 5.5a3.5 3.5 0 0 1 0 5M12 3.8a6 6 0 0 1 0 8.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" hidden/><path id="snd-x" d="M10.5 6l4 4m0-4l-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><video class="craft-video" id="craftVideo" src="video/engraving.mp4" poster="video/engraving.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Close-up of a hand engraver cutting a scroll pattern into a gold engagement ring"></video>
+  <p class="craft-note">Concept film generated for this site, styled on Jason's own work.</p></div>
+</section>
+
 <section class="wrap statement">
   <p>For more than 27 years, Jason Carlin has made rings the slow way. <span>A graver, a loupe and a steady hand, one cut at a time.</span></p>
 </section>
@@ -341,8 +363,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 window.CHAPTERS=[
   {k:'Design', s:0,    e:2.6,  cap:'Jason drafts the ring around your hand, your stone and the way you live.'},
   {k:'Set',    s:2.6,  e:7.2,  cap:'Each diamond flies home to its seat, and the prongs are pushed over by hand.'},
-  {k:'Engrave',s:7.2,  e:14.6, cap:'A traditional leaf pattern, cut with a hand graver one stroke at a time.'},
-  {k:'Finish', s:14.6, e:18.5, cap:'Milgrain edges, a final polish, and the pattern catches the light.'}
+  {k:'Engrave',s:7.2,  e:18.8, cap:'Jason pushes the graver by hand and turns the ring under it, cutting every scroll and leaf one stroke at a time.'},
+  {k:'Finish', s:18.8, e:22.7, cap:'Milgrain edges, a final polish, and the pattern catches the light.'}
 ];
 (function(){
   const box=document.getElementById('chapters');
@@ -352,12 +374,20 @@ window.CHAPTERS=[
     b.innerHTML='<span class="bar"><i></i></span>'+c.k;
     box.appendChild(b);
   });
+(function(){ const v=document.getElementById('craftVideo'), b=document.getElementById('sound');
+  if(!v||!b) return;
+  b.addEventListener('click',()=>{ v.muted=!v.muted; if(!v.muted) v.play().catch(()=>{});
+    document.getElementById('snd-waves').hidden=v.muted; document.getElementById('snd-x').hidden=!v.muted;
+    b.setAttribute('aria-label', v.muted?'Turn sound on':'Turn sound off'); });
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){ v.removeAttribute('autoplay'); v.pause(); }
+})();
   setTimeout(()=>{ if(!window.__ringReady) document.getElementById('stage').classList.add('no-webgl'); },8000);
 })();
 </script>
 
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import * as THREE from 'three';
 
 const stageEl = document.getElementById('stage');
 const canvas = document.getElementById('gl');
@@ -411,7 +441,6 @@ function makeGemCube(){
 const gemCube = makeGemCube();
 const key = new THREE.DirectionalLight(0xfff0d8, 1.6); key.position.set(3,5,4); scene.add(key);
 const rim = new THREE.DirectionalLight(0xcfe0ff, 0.8); rim.position.set(-4,2,-3); scene.add(rim);
-const tipLight = new THREE.PointLight(0xff9a3c, 0, 1.6, 2); scene.add(tipLight);
 
 /* ---------- ring dimensions (1 unit = ring outer radius) ---------- */
 const RO=1.0, RI=0.9, BW=0.36;
@@ -487,6 +516,57 @@ function spiral(C,r0,a0,turns,dirSign,w0,w1){
   for(const x of [PX0-24,PX1+24]) groove([[x,22],[x,234]],3.4);
 })();
 
+/* ---------- cut order: short strokes grouped into ~150px cells, worked left to right ---------- */
+const OPS=(function(){
+  const resample=(pts,step)=>{ const cum=[0]; for(let i=1;i<pts.length;i++) cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
+    const L=cum[cum.length-1], n=Math.max(1,Math.ceil(L/step)), r=[]; let j=1;
+    for(let k=0;k<=n;k++){ const s=L*k/n; while(j<cum.length-1 && cum[j]<s) j++; const a=pts[j-1], b=pts[j], sl=(cum[j]-cum[j-1])||1, f=Math.min(1,Math.max(0,(s-cum[j-1])/sl)); r.push([a[0]+(b[0]-a[0])*f, a[1]+(b[1]-a[1])*f]); }
+    return {r,L}; };
+  const ops=[];
+  prims.forEach((p,i)=>{
+    if(p.k==='g'){
+      const {r}=resample(p.pts,1.5), n=r.length;
+      const horiz=p.pts.every(q=>Math.abs(q[1]-p.pts[0][1])<.01) && (p.pts[0][1]<40||p.pts[0][1]>215);
+      const vert=p.pts.length===2 && Math.abs(p.pts[0][0]-p.pts[1][0])<.01;
+      for(let c=0;c<n-1;c+=72){ const e=Math.min(n,c+74), pts=r.slice(c,e);
+        ops.push({k:'g', pts, w:pts.map((_,j)=>p.w0+(p.w1-p.w0)*(c+j)/(n-1)), gen:i+c*1e-4, first:horiz||vert}); }
+    }else if(p.k==='f'){
+      const a0=p.poly[0], a1=p.poly[28];
+      ops.push({k:'f', poly:p.poly, a0, a1, pts:resample([a0,a1],1.5).r, gen:i+2.5});
+    }else{
+      const pts=[]; for(let k=0;k<=14;k++){ const a=k/14*Math.PI*2; pts.push([p.x+Math.cos(a)*p.r*.45, p.y+Math.sin(a)*p.r*.45]); }
+      ops.push({k:'g', pts, w:pts.map(()=>p.r*1.2), gen:i});
+    }
+  });
+  const cell=o=>Math.floor((o.pts[0][0]-(PX0-30))/150);
+  ops.sort((a,b)=>cell(a)-cell(b) || (b.first?1:0)-(a.first?1:0) || a.gen-b.gen);
+  // timeline: cutting time follows stroke length, plus a lift-and-move between strokes
+  let T=0, prev=null;
+  for(const o of ops){
+    const len=o.pts.length*1.5, st=o.pts[0];
+    o.g0=T; T+= prev ? 6+Math.hypot(st[0]-prev[0],st[1]-prev[1])*.12 : 0;
+    o.from = prev ? prev.slice() : st.slice();
+    o.s0=T; T+= o.k==='f' ? len*.8+8 : len; o.s1=T; prev=o.pts[o.pts.length-1];
+  }
+  for(const o of ops){ o.g0/=T; o.s0/=T; o.s1/=T; }
+  return ops;
+})();
+const OPS_S0=OPS.map(o=>o.g0);
+function tipAt(p,out){
+  if(p>1){ const f=Math.min(1,(p-1)/.2); out.x=PX0-24+f*(PX1-PX0+48); out.y=PCY+96*Math.sin(p*2600); out.dx=0; out.dy=1; out.cut=false; out.matte=true; out.lift=0; out.op=-1; out.f=0; return out; }
+  let lo=0, hi=OPS.length-1; while(lo<hi){ const m=(lo+hi+1)>>1; if(OPS_S0[m]<=p) lo=m; else hi=m-1; }
+  const o=OPS[lo]; out.matte=false; out.op=lo;
+  if(p<o.s0){ const f=(p-o.g0)/Math.max(1e-9,o.s0-o.g0);
+    out.x=o.from[0]+(o.pts[0][0]-o.from[0])*f; out.y=o.from[1]+(o.pts[0][1]-o.from[1])*f;
+    const q=o.pts[Math.min(1,o.pts.length-1)]; out.dx=q[0]-o.pts[0][0]; out.dy=q[1]-o.pts[0][1];
+    out.cut=false; out.lift=Math.sin(Math.PI*Math.min(1,f)); out.f=0; return out; }
+  const f=Math.min(1,(p-o.s0)/Math.max(1e-9,o.s1-o.s0)), n=o.pts.length, x=f*(n-1), j=Math.min(n-2,Math.floor(x)), k=x-j;
+  const a=o.pts[Math.max(0,j)], b=o.pts[Math.min(n-1,j+1)];
+  out.x=a[0]+(b[0]-a[0])*k; out.y=a[1]+(b[1]-a[1])*k;
+  const a2=o.pts[Math.max(0,j-2)], b2=o.pts[Math.min(n-1,j+3)]; out.dx=b2[0]-a2[0]; out.dy=b2[1]-a2[1];
+  out.cut=f<1; out.lift=0; out.f=f; return out;
+}
+
 const heightC=document.createElement('canvas'); heightC.width=TW; heightC.height=TH;
 const roughC=document.createElement('canvas'); roughC.width=TW; roughC.height=TH;
 const maskC=document.createElement('canvas'); maskC.width=TW; maskC.height=TH;
@@ -544,37 +624,60 @@ const normTex=(function(){
       dat[o]=M[i*4]; dat[o+1]=Rg[i*4]; dat[o+2]=0; dat[o+3]=255;
     }
   }
+  // cut-order map: the moment (0..1, then 1..1.2 for background matting) each texel gets cut
+  const tt=new Float32Array(TW*TH).fill(9);
+  const c01=x=>Math.min(1,Math.max(0,x));
+  const stamp=(x,y,rad,time)=>{ const cx=x*TS, cy=y*TS, R=rad*TS;
+    const xa=Math.max(0,Math.floor(cx-R)), xb=Math.min(TW-1,Math.ceil(cx+R)), ya=Math.max(0,Math.floor(cy-R)), yb=Math.min(TH-1,Math.ceil(cy+R));
+    for(let yy=ya;yy<=yb;yy++) for(let xx=xa;xx<=xb;xx++){ const dx=xx+.5-cx, dy=yy+.5-cy; if(dx*dx+dy*dy<=R*R){ const i=yy*TW+xx; if(time<tt[i]) tt[i]=time; } } };
+  const fillPoly=(o)=>{ const poly=o.poly; let ymin=1e9,ymax=-1e9; for(const q of poly){ ymin=Math.min(ymin,q[1]); ymax=Math.max(ymax,q[1]); }
+    const ax=o.a1[0]-o.a0[0], ay=o.a1[1]-o.a0[1], al2=(ax*ax+ay*ay)||1;
+    for(let yy=Math.max(0,Math.floor(ymin*TS)); yy<=Math.min(TH-1,Math.ceil(ymax*TS)); yy++){
+      const y=(yy+.5)/TS, xs=[];
+      for(let k=0;k<poly.length;k++){ const a=poly[k], b=poly[(k+1)%poly.length]; if((a[1]<=y)!==(b[1]<=y)) xs.push(a[0]+(y-a[1])/(b[1]-a[1])*(b[0]-a[0])); }
+      xs.sort((p,q)=>p-q);
+      for(let k=0;k+1<xs.length;k+=2) for(let xx=Math.max(0,Math.ceil(xs[k]*TS-.5)); xx<=Math.min(TW-1,Math.floor(xs[k+1]*TS-.5)); xx++){
+        const x=(xx+.5)/TS, time=o.s0+(o.s1-o.s0)*c01(((x-o.a0[0])*ax+(y-o.a0[1])*ay)/al2), i=yy*TW+xx; if(time<tt[i]) tt[i]=time; } } };
+  for(const o of OPS){
+    if(o.k==='f') fillPoly(o);
+    else { const n=o.pts.length; for(let j=0;j<n;j++) stamp(o.pts[j][0],o.pts[j][1],o.w[j]*.5+1.3,o.s0+(o.s1-o.s0)*(n>1?j/(n-1):0)); }
+  }
+  const ttF=new Float32Array(TW*TH);
+  for(let y=0;y<TH;y++){ const ly=y/TS; for(let x=0;x<TW;x++){ const i=y*TW+x; let v=tt[i];
+    if(v===9){ const lx=x/TS, inPanel=lx>PX0-22&&lx<PX1+22&&ly>24&&ly<232;
+      v = inPanel ? (M[i*4]<10 ? 1+.2*c01((lx-(PX0-22))/(PX1-PX0+44)) : .999) : (M[i*4]>=10||hf[i]<.985 ? .999 : -1); }
+    ttF[(TH-1-y)*TW+x]=v; } }
+  const timeTex=new THREE.DataTexture(ttF,TW,TH,THREE.RedFormat,THREE.FloatType);
+  timeTex.minFilter=timeTex.magFilter=THREE.NearestFilter; timeTex.generateMipmaps=false; timeTex.needsUpdate=true;
   const mk=(d,cs)=>{ const t=new THREE.DataTexture(d,TW,TH,THREE.RGBAFormat); t.colorSpace=cs; t.generateMipmaps=true; t.minFilter=THREE.LinearMipmapLinearFilter; t.magFilter=THREE.LinearFilter; t.wrapS=THREE.RepeatWrapping; t.anisotropy=renderer.capabilities.getMaxAnisotropy(); t.needsUpdate=true; return t; };
-  window.__engr={col:mk(col,THREE.SRGBColorSpace), dat:mk(dat,THREE.NoColorSpace)};
-  // for each pattern column, the rows where metal is cut: the graver tip hops between them
-  window.__cutRows=[]; for(let x=0;x<PW;x+=2){ const rows=[]; for(let y=30;y<226;y+=3){ if(M[((y*TS)*TW+x*TS)*4]>128) rows.push(y); } window.__cutRows[x>>1]=rows; }
+  window.__engr={col:mk(col,THREE.SRGBColorSpace), dat:mk(dat,THREE.NoColorSpace), time:timeTex};
   return mk(nrm,THREE.NoColorSpace);
 })();
 const colTex=window.__engr.col, datTex=window.__engr.dat;
 
 /* ---------- materials ---------- */
 const GOLD = new THREE.Color().setRGB(1.0, 0.74, 0.36);
-const eng = { uCursor:{value:0}, uGlow:{value:0}, uSweep:{value:-1}, uSweepAmt:{value:0} };
+const eng = { uP:{value:-1}, uTimeTex:{value:window.__engr.time}, uGlow:{value:0}, uSweep:{value:-1}, uSweepAmt:{value:0} };
 const bandMat = new THREE.MeshPhysicalMaterial({color:GOLD, metalness:1, roughness:.5, map:colTex,
   normalMap:normTex, normalScale:new THREE.Vector2(1,1), roughnessMap:datTex,
-  emissiveMap:datTex, emissive:new THREE.Color(1.0,.46,.14), emissiveIntensity:3.2});
+  emissiveMap:datTex, emissive:new THREE.Color(1.0,.86,.62), emissiveIntensity:1.6});
 bandMat.onBeforeCompile = (sh)=>{
   Object.assign(sh.uniforms, eng);
-  sh.fragmentShader = 'uniform float uCursor;\nuniform float uGlow;\nuniform float uSweep;\nuniform float uSweepAmt;\n' + sh.fragmentShader
+  sh.fragmentShader = 'uniform float uP;\nuniform sampler2D uTimeTex;\nuniform float uGlow;\nuniform float uSweep;\nuniform float uSweepAmt;\nfloat engRev( vec2 uv ){ return step( texture2D( uTimeTex, uv ).r, uP ); }\n' + sh.fragmentShader
   .replace('#include <map_fragment>', `
 #ifdef USE_MAP
   vec4 sampledDiffuseColor = texture2D( map, vMapUv );
-  diffuseColor *= mix( vec4(1.0), sampledDiffuseColor, step( vMapUv.x, uCursor ) );
+  diffuseColor *= mix( vec4(1.0), sampledDiffuseColor, engRev( vMapUv ) );
 #endif`)
   .replace('#include <roughnessmap_fragment>', `
 float roughnessFactor = roughness;
 #ifdef USE_ROUGHNESSMAP
-  roughnessFactor *= mix( 0.3, texture2D( roughnessMap, vRoughnessMapUv ).g, step( vRoughnessMapUv.x, uCursor ) );
+  roughnessFactor *= mix( 0.3, texture2D( roughnessMap, vRoughnessMapUv ).g, engRev( vRoughnessMapUv ) );
 #endif`)
   .replace('#include <normal_fragment_maps>', `
 #ifdef USE_NORMALMAP_TANGENTSPACE
   vec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;
-  mapN = mix( vec3( 0.0, 0.0, 1.0 ), mapN, step( vNormalMapUv.x, uCursor ) );
+  mapN = mix( vec3( 0.0, 0.0, 1.0 ), mapN, engRev( vNormalMapUv ) );
   mapN.xy *= normalScale;
   normal = normalize( tbn * mapN );
 #endif`)
@@ -582,8 +685,8 @@ float roughnessFactor = roughness;
 #ifdef USE_EMISSIVEMAP
   float emk = texture2D( emissiveMap, vEmissiveMapUv ).r;
   float eu = vEmissiveMapUv.x;
-  float behind = uCursor - eu;
-  float trail = behind >= 0.0 ? exp( -behind * 55.0 ) : 0.0;
+  float behind = uP - texture2D( uTimeTex, vEmissiveMapUv ).r;
+  float trail = ( behind >= 0.0 && uP <= 1.0 ) ? exp( -behind * 160.0 ) : 0.0;
   float sw = exp( -pow( ( eu - uSweep ) * 20.0, 2.0 ) );
   totalEmissiveRadiance *= emk * ( trail * uGlow + sw * uSweepAmt );
 #endif`);
@@ -766,31 +869,27 @@ const innerWire=new THREE.LineSegments(new THREE.WireframeGeometry(wg2), wireMat
 const stoneWire=new THREE.LineSegments(new THREE.EdgesGeometry(diaGeo,1), wireMat); stoneWire.scale.setScalar(RG); stoneWire.position.set(0,YG,0); spin.add(stoneWire);
 const wires=[bandWire,innerWire,stoneWire].map(w=>({w,n:w.geometry.attributes.position.count}));
 
-// hand graver: steel square shank + mushroom handle; tip at local origin, shank along +X
+// hand graver held in a palm-push grip; tool local frame: tip at origin, shank toward the handle along +X, +Y up
 const graver=new THREE.Group(); scene.add(graver);
 {
-  const steel=new THREE.MeshPhysicalMaterial({color:0xcfd3d8,metalness:1,roughness:.22});
-  const shank=new THREE.Mesh(new THREE.BoxGeometry(.95,.036,.036), steel); shank.position.x=.08+.475; graver.add(shank);
-  const face=new THREE.Mesh(new THREE.ConeGeometry(.026,.1,4), steel); face.rotation.z=Math.PI/2; face.rotation.x=Math.PI/4; face.position.x=.05; graver.add(face);
-  const wood=new THREE.MeshPhysicalMaterial({color:0x7a4a26,metalness:0,roughness:.45,clearcoat:.6,clearcoatRoughness:.3});
-  const hp=[[.001,0],[.03,0],[.035,.05],[.05,.12],[.1,.22],[.13,.3],[.12,.34],[.001,.345]].map(([x,y])=>new THREE.Vector2(x,y));
-  const handle=new THREE.Mesh(new THREE.LatheGeometry(hp,32), wood); handle.rotation.z=-Math.PI/2; handle.position.x=.98; graver.add(handle);
-  const ferrule=new THREE.Mesh(new THREE.CylinderGeometry(.036,.036,.05,24), new THREE.MeshPhysicalMaterial({color:0xd9b56a,metalness:1,roughness:.2})); ferrule.rotation.z=Math.PI/2; ferrule.position.x=.98; graver.add(ferrule);
+  const steel=new THREE.MeshPhysicalMaterial({color:0xe2e6ea,metalness:1,roughness:.3,envMapIntensity:1.6});
+  const shank=new THREE.Mesh(new THREE.BoxGeometry(2.0,.07,.07), steel); shank.position.x=.09+1.0; graver.add(shank);
+  const face=new THREE.Mesh(new THREE.ConeGeometry(.05,.16,4), steel); face.rotation.z=Math.PI/2; face.rotation.x=Math.PI/4; face.position.x=.075; graver.add(face);
+  const wood=new THREE.MeshPhysicalMaterial({color:0x6e4122,metalness:0,roughness:.42,clearcoat:.7,clearcoatRoughness:.25});
+  const hp=[[.001,0],[.08,0],[.1,.12],[.16,.28],[.32,.5],[.42,.68],[.4,.78],[.001,.8]].map(([x,y])=>new THREE.Vector2(x,y));
+  const handle=new THREE.Mesh(new THREE.LatheGeometry(hp,40), wood); handle.rotation.z=-Math.PI/2; handle.position.x=2.08; graver.add(handle);
+  const ferrule=new THREE.Mesh(new THREE.CylinderGeometry(.085,.085,.12,24), new THREE.MeshPhysicalMaterial({color:0xd9b56a,metalness:1,roughness:.2})); ferrule.rotation.z=Math.PI/2; ferrule.position.x=2.08; graver.add(ferrule);
 }
 graver.visible=false;
+const microLight=new THREE.PointLight(0xfff5e8,0,4,2); scene.add(microLight);
 
-// metal chips thrown off by the graver
-const CH_N=420;
-const chipGeo=new THREE.BufferGeometry();
-const chipPos=new Float32Array(CH_N*3), chipCol=new Float32Array(CH_N*3);
-chipGeo.setAttribute('position',new THREE.BufferAttribute(chipPos,3));
-chipGeo.setAttribute('color',new THREE.BufferAttribute(chipCol,3));
-const dotTex=(()=>{ const c=document.createElement('canvas'); c.width=c.height=32; const g=c.getContext('2d'); const r=g.createRadialGradient(16,16,0,16,16,16); r.addColorStop(0,'#fff'); r.addColorStop(.35,'rgba(255,220,160,.8)'); r.addColorStop(1,'rgba(255,200,120,0)'); g.fillStyle=r; g.fillRect(0,0,32,32); return new THREE.CanvasTexture(c); })();
-const chips=new THREE.Points(chipGeo,new THREE.PointsMaterial({size:.035,map:dotTex,vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
-scene.add(chips);
-const chipState=Array.from({length:CH_N},()=>({life:0,max:1,v:new THREE.Vector3(),p:new THREE.Vector3()}));
-let chipIdx=0, chipAcc=0;
-function resetChips(){ chipState.forEach(c=>c.life=0); }
+// metal curls peeled off by the graver
+const curlGeo=new THREE.TorusGeometry(.032,.0065,6,22,Math.PI*1.7);
+const curlMat=new THREE.MeshPhysicalMaterial({color:new THREE.Color().setRGB(1,.8,.45),metalness:1,roughness:.12});
+const curls=Array.from({length:48},()=>{ const m=new THREE.Mesh(curlGeo,curlMat); m.visible=false; scene.add(m); return {m,life:0,v:new THREE.Vector3(),w:new THREE.Vector3()}; });
+let curlIdx=0, activeCurl=null, activeOp=-1;
+function resetChips(){ curls.forEach(c=>{ c.m.visible=false; c.life=0; }); activeCurl=null; activeOp=-1; }
+function releaseCurl(){ if(!activeCurl) return; const c=activeCurl; c.life=1.4; c.v.set((Math.random()-.5)*.3,.55+Math.random()*.4,(Math.random()-.2)*.4).addScaledVector(Dw,.25); c.w.set(Math.random()*6-3,Math.random()*6-3,Math.random()*6-3); activeCurl=null; }
 
 /* ---------- timeline helpers ---------- */
 const clamp01=x=>Math.min(1,Math.max(0,x));
@@ -798,52 +897,70 @@ const seg=(t,a,b)=>clamp01((t-a)/(b-a));
 const eio=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
 const eout=x=>1-Math.pow(1-x,3);
 const lerp=THREE.MathUtils.lerp;
-const END=18.5, CUT0=7.9, CUT1=14.0, U0=.205, U1=.795;
-const POSE_BEAUTY=new THREE.Euler(.3,-.62,0), POSE_ENG=new THREE.Euler(.1,-1.18,0), POSE_FINAL=new THREE.Euler(-.12,-.78,0);
+const CUT0=8.3, CUT1=18.0, E1=18.8, END=E1+3.9, U0=.205, U1=.795;
+const POSE_BEAUTY=new THREE.Euler(.3,-.62,0), POSE_FINAL=new THREE.Euler(-.12,-.78,0);
+function progressAt(t){
+  if(t<CUT0) return -.5;
+  const MT=CUT1-.9;
+  if(t<MT){ const x=(t-CUT0)/(MT-CUT0); return x<.28 ? .008*(x/.28) : .008+.992*Math.pow((x-.28)/.72,1.3); }
+  if(t<CUT1) return 1+.2*(t-MT)/.9;
+  return 2;
+}
 
-// angle (in ring plane) that faces the camera while in the engraving pose
-const qEng=new THREE.Quaternion().setFromEuler(POSE_ENG);
-const camLocal=camDir0.clone().applyQuaternion(qEng.clone().invert());
-const PHI=Math.atan2(camLocal.y,camLocal.x);
-const sTrack=u=>PHI-Math.PI/2-2*Math.PI*u;
-const wrapPI=a=>Math.atan2(Math.sin(a),Math.cos(a));
-const K=wrapPI(sTrack(U0))-sTrack(U0);
-const S_A=sTrack(U0)+K, S_E=sTrack(U1)+K, S_F=Math.floor(S_E/(Math.PI*2))*Math.PI*2;
+// the vise: turn the ring so the point being cut sits under the graver, facing up, with the cut running toward the push
+const W0=new THREE.Vector3(0,0,0), Dw=new THREE.Vector3(-1,0,0), Nw=new THREE.Vector3(0,.8,.6).normalize();
+const Mw=new THREE.Matrix4().makeBasis(Dw,Nw,new THREE.Vector3().crossVectors(Dw,Nw));
+const Bw=Dw.clone().multiplyScalar(-.85).addScaledVector(Nw,.53).normalize();
+const toolQ=new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(Bw, Nw.clone().sub(Bw.clone().multiplyScalar(Nw.dot(Bw))).normalize(), new THREE.Vector3().crossVectors(Bw,Nw.clone().sub(Bw.clone().multiplyScalar(Nw.dot(Bw)))).normalize()));
+const _n=new THREE.Vector3(), _d=new THREE.Vector3(), _b=new THREE.Vector3(), _Ml=new THREE.Matrix4(), _R=new THREE.Matrix4();
+function viseQuat(tip,out){
+  const a=Math.PI/2+2*Math.PI*tip.x/PW;
+  _n.set(Math.cos(a),Math.sin(a),0);
+  _d.set(-Math.sin(a),Math.cos(a),0).multiplyScalar(tip.dx*2*Math.PI*RO/PW).add(_b.set(0,0,-tip.dy*BW/PH));
+  if(_d.lengthSq()<1e-12) _d.set(-Math.sin(a),Math.cos(a),0);
+  _d.normalize(); _b.crossVectors(_d,_n);
+  _Ml.makeBasis(_d,_n,_b); _R.multiplyMatrices(Mw,_Ml.transpose()); return out.setFromRotationMatrix(_R);
+}
+const camE=new THREE.Vector3(.18,.62,1).normalize();
 
-const tmpV=new THREE.Vector3(), tmpV2=new THREE.Vector3(), tmpQ=new THREE.Quaternion();
+const tmpV=new THREE.Vector3(), tmpV2=new THREE.Vector3(), tmpQ=new THREE.Quaternion(), tmpE=new THREE.Euler();
+const qA=new THREE.Quaternion(), qT=new THREE.Quaternion(), qCur=new THREE.Quaternion(); let qCurOk=false;
+const tip={x:0,y:0,dx:1,dy:0,cut:false,lift:0,op:-1,f:0,matte:false};
 let baseDist=7;
 
 function surfaceLocal(u,v,out){ const a=Math.PI/2+2*Math.PI*u; return out.set(Math.cos(a)*RO, Math.sin(a)*RO, (v-.5)*BW); }
 
-let dragYaw=0, idleT=0, tipY=128;
+let dragYaw=0, idleT=0;
 
 function update(t, dt){
   /* pose */
-  const toEng=eio(seg(t,6.8,7.7)), back=eio(seg(t,14.3,16.2)), w=toEng*(1-back);
+  const toEng=eio(seg(t,6.9,CUT0-.1)), back=eio(seg(t,CUT1+.15,E1+1.3)), w=toEng*(1-back);
   const introYaw=(1-eout(seg(t,0,2.6)))*.9;
   const idle = t>=END;
-  const A = t<10 ? POSE_BEAUTY : POSE_FINAL;
-  pivot.rotation.set(lerp(A.x,POSE_ENG.x,w), lerp(A.y,POSE_ENG.y,w)+introYaw+(idle?dragYaw+Math.sin(idleT*.45)*.16:0), 0);
+  const A = t<12 ? POSE_BEAUTY : POSE_FINAL;
+  qA.setFromEuler(tmpE.set(A.x, A.y+introYaw+(idle?dragYaw+Math.sin(idleT*.45)*.16:0), 0));
   pivot.scale.setScalar(lerp(.86,1,eout(seg(t,0,2.4))));
-  pivot.position.y = idle ? Math.sin(idleT*.9)*.02 : 0;
+  spin.rotation.z = t<2.6 ? lerp(-2.4,0,eout(seg(t,0,2.6))) : 0;
+  const p=progressAt(t);
+  tipAt(Math.max(0,Math.min(1.2,p)),tip);
+  if(w>0){
+    viseQuat(tip,qT);
+    if(!qCurOk || !(dt>0)) qCur.copy(qT); else qCur.slerp(qT,1-Math.exp(-dt*(p<.01?5:9)));
+    qCurOk=true;
+    pivot.quaternion.slerpQuaternions(qA,qCur,w);
+    const P=surfaceLocal(tip.x/PW,1-tip.y/PH,tmpV).applyQuaternion(qCur);
+    pivot.position.copy(W0).sub(P).multiplyScalar(w);
+  }else{
+    qCurOk=false; pivot.quaternion.copy(qA); pivot.position.set(0, idle ? Math.sin(idleT*.9)*.02 : 0, 0);
+  }
 
-  /* spin around the ring's own axis */
-  let s;
-  if(t<2.6) s=lerp(-2.4,0,eout(seg(t,0,2.6)));
-  else if(t<7.2) s=0;
-  else if(t<CUT0) s=lerp(0,S_A,eio(seg(t,7.2,CUT0)));
-  else if(t<CUT1) s=sTrack(lerp(U0,U1,seg(t,CUT0,CUT1)))+K;
-  else if(t<14.6) s=S_E;
-  else s=lerp(S_E,S_F,eio(seg(t,14.6,16.5)));
-  spin.rotation.z=s;
-
-  /* camera dolly */
+  /* camera: product view, easing into a close-up over the bench */
   scene.updateMatrixWorld(true);
-  const dolly=lerp(1,.56,w);
-  const uF = t<CUT0 ? U0 : (t<CUT1 ? lerp(U0,U1,seg(t,CUT0,CUT1)) : U1);
-  const front=spin.localToWorld(surfaceLocal(uF,.5,tmpV2)).multiplyScalar(w*.85).add(tmpV.set(0,.1*(1-w),0));
-  camera.position.copy(camDir0).multiplyScalar(baseDist*dolly).add(front);
-  camera.lookAt(front);
+  const close=lerp(.42,.6,eio(seg(t,CUT0+2.4,CUT0+4.2)));
+  const tgt=tmpV2.set(0,.1,0).lerp(tmpV.set(.4,.14,.03),w);
+  camera.position.copy(camDir0).multiplyScalar(baseDist).add(tmpV.set(0,.1,0))
+    .lerp(tmpV.copy(camE).multiplyScalar(baseDist*close).add(tgt),w);
+  camera.lookAt(tgt);
   camera.updateMatrixWorld();
 
   /* design: wireframe sketches in, metal fades up */
@@ -855,7 +972,7 @@ function update(t, dt){
   head.visible = metalA>0; beads.visible = true;
 
   /* set: stones fly in */
-  const glintBoost = t<CUT0 ? .55 : (t<14.6 ? .25 : lerp(.25,1,seg(t,15,16.5)));
+  const glintBoost = t<CUT0 ? .55 : (t<E1 ? .25 : lerp(.25,1,seg(t,E1+.5,E1+2)));
   for(const st of stones){
     const k=seg(t,st.t0,st.t0+st.dur);
     st.mesh.visible = t>=st.t0;
@@ -870,7 +987,6 @@ function update(t, dt){
     }else if(k>=1){
       st.mesh.position.copy(st.target); st.mesh.quaternion.copy(st.qFinal); st.mesh.scale.setScalar(st.size);
     }
-    // landing flash + ongoing twinkle
     const land=st.t0+st.dur, fk=seg(t,land-.05,land+.45);
     const fl=fk>0&&fk<1 ? Math.sin(fk*Math.PI) : 0;
     const top=tmpV.copy(st.target).normalize().multiplyScalar(st.size*.45).add(st.target);
@@ -882,51 +998,40 @@ function update(t, dt){
   setProngs(1-eio(seg(t,6.55,7.1)));
 
   /* engrave */
-  const cutK=seg(t,CUT0,CUT1);
-  const u = t<CUT0 ? U0 : lerp(U0,U1,cutK);
-  eng.uCursor.value = t<CUT0 ? 0 : (t>=CUT1 ? 1 : u);
-  eng.uGlow.value = (t>=CUT0 && t<CUT1+.6) ? 1-seg(t,CUT1,CUT1+.6) : 0;
-  const sweepK=seg(t,15.3,16.9);
+  eng.uP.value = p;
+  eng.uGlow.value = (t>=CUT0 && t<CUT1) ? .55 : 0;
+  const sweepK=seg(t,E1+.8,E1+2.4);
   eng.uSweep.value = lerp(U0-.06,U1+.06,eio(sweepK));
   eng.uSweepAmt.value = sweepK>0&&sweepK<1 ? Math.sin(sweepK*Math.PI)*.75 : 0;
 
-  const toolIn=eio(seg(t,7.2,CUT0)), toolOut=eio(seg(t,CUT1,14.7));
-  graver.visible = t>7.2 && t<14.7;
+  const toolIn=eio(seg(t,7.3,CUT0)), toolOut=eio(seg(t,CUT1,E1));
+  graver.visible = t>7.3 && t<E1;
+  microLight.intensity = w*2.6; microLight.position.copy(W0).addScaledVector(Nw,.9).add(tmpV.set(-.3,0,.2));
   if(graver.visible){
-    const rows=window.__cutRows[Math.min(window.__cutRows.length-1,Math.round(u*PW/2))]||[];
-    const target = rows.length ? rows[Math.floor(t*9)%rows.length] : PCY;
-    tipY += (target-tipY)*Math.min(1,dt*18 || 1);
-    const vpx = tipY;
-    const pL=surfaceLocal(u, 1-vpx/PH, tmpV);
-    const pW=spin.localToWorld(pL);
-    const nW=tmpV2.set(Math.cos(Math.PI/2+2*Math.PI*u),Math.sin(Math.PI/2+2*Math.PI*u),0).transformDirection(spin.matrixWorld);
-    const dir=nW.clone().multiplyScalar(.5).add(new THREE.Vector3(.85,.3,.1)).normalize();
+    const tipW=spin.localToWorld(surfaceLocal(tip.x/PW,1-tip.y/PH,tmpV));
     const away=(1-toolIn)+toolOut;
-    graver.position.copy(pW).addScaledVector(dir, away*2.6 + .004*Math.sin(t*55));
-    graver.quaternion.setFromUnitVectors(new THREE.Vector3(1,0,0), dir);
-    graver.rotateX(.5);
-    const cutting=t>=CUT0 && t<CUT1;
-    tipLight.position.copy(pW).addScaledVector(nW,.08);
-    tipLight.intensity = cutting ? 2.2+Math.random()*1.4 : 0;
-    if(cutting && dt>0){
-      chipAcc+=dt*95;
-      while(chipAcc>=1){ chipAcc--; const c=chipState[chipIdx]; chipIdx=(chipIdx+1)%CH_N;
-        c.p.copy(pW); c.life=c.max=.35+Math.random()*.5;
-        c.v.copy(nW).multiplyScalar(.5+Math.random()*.6);
-        c.v.x+=(Math.random()-.2)*1.1; c.v.y+=Math.random()*1.1; c.v.z+=(Math.random()-.5)*.9; }
+    const push = tip.cut ? .012*Math.pow(Math.sin(t*13),2) : 0;
+    const buzz = tip.matte ? .01*Math.sin(t*90) : 0;
+    graver.position.copy(tipW).addScaledVector(Nw,tip.lift*.09+buzz).addScaledVector(Dw,push).addScaledVector(Bw,away*3.2);
+    graver.quaternion.copy(toolQ);
+
+    /* curls: one grows ahead of the point on each stroke, then drops away */
+    if(dt>0){
+      if(tip.cut && tip.op!==activeOp){ releaseCurl(); activeOp=tip.op; activeCurl=curls[curlIdx]; curlIdx=(curlIdx+1)%curls.length; activeCurl.life=0; activeCurl.m.visible=true; }
+      if(!tip.cut && activeCurl){ releaseCurl(); activeOp=-1; }
+      if(activeCurl){ const g=Math.min(1,.25+tip.f*2.2), m=activeCurl.m;
+        m.position.copy(tipW).addScaledVector(Dw,.035+.02*g).addScaledVector(Nw,.03*g);
+        m.quaternion.setFromRotationMatrix(Mw).multiply(tmpQ.setFromAxisAngle(tmpV.set(0,0,1),Math.PI*.6-g*2.2));
+        m.scale.setScalar(.35+.65*g); }
     }
-  }else{ tipLight.intensity=0; }
-  // chips integrate
-  for(let i=0;i<CH_N;i++){ const c=chipState[i];
-    if(c.life>0){ c.life-=dt; c.v.y-=3.2*dt; c.p.addScaledVector(c.v,dt); }
-    const f=Math.max(0,c.life/c.max);
-    chipPos[i*3]=c.p.x; chipPos[i*3+1]=c.p.y; chipPos[i*3+2]=c.p.z;
-    chipCol[i*3]=f*1.0; chipCol[i*3+1]=f*.78; chipCol[i*3+2]=f*.45;
-  }
-  chipGeo.attributes.position.needsUpdate=true; chipGeo.attributes.color.needsUpdate=true;
+  }else if(activeCurl){ releaseCurl(); }
+  for(const c of curls){ if(c===activeCurl || c.life<=0) continue;
+    if(dt>0){ c.life-=dt; c.v.y-=2.4*dt; c.m.position.addScaledVector(c.v,dt); c.m.rotation.x+=c.w.x*dt; c.m.rotation.y+=c.w.y*dt; c.m.rotation.z+=c.w.z*dt; }
+    if(c.life<.3) c.m.scale.setScalar(Math.max(.001,c.life/.3)*c.m.scale.x/(c.m.scale.x||1)*.9);
+    if(c.life<=0) c.m.visible=false; }
 
   /* finish: milgrain rolls in from the top of the ring */
-  const mk=t-15.0;
+  const mk=t-(E1+.5);
   setBeads(d=>eout(clamp01((mk-d*1.5)/.3)));
 }
 
