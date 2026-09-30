@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carlin Design &amp; Engraving</title>
+<meta name="description" content="Custom rings designed, set and hand engraved by Jason Carlin at the Woodbridge Jewelry Exchange, Woodbridge Township, New Jersey.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap">
+<style>
+/* Layout: Apple-style product page. A black stage for the 3D bench scene, then quiet light sections
+   with oversized system type, one gold accent, and the real work doing the talking. */
+:root{
+  --bg:#fbfbfd;
+  --bg-alt:#f3f2ef;
+  --fg:#1d1d1f;
+  --muted:#6e6e73;
+  --line:rgba(29,29,31,.12);
+  --gold:#9a7334;
+  --gold-soft:#d8b673;
+  --stage:#000;
+  --stage-fg:#f5f5f7;
+  --stage-muted:#86868b;
+  --card:#ffffff;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --script:"Pinyon Script","Snell Roundhand","Apple Chancery",cursive;
+  --wrap:1080px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#000; --bg-alt:#111112; --fg:#f5f5f7; --muted:#a1a1a6; --line:rgba(245,245,247,.14);
+    --gold:#d8b673; --card:#1c1c1e; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#000; --bg-alt:#111112; --fg:#f5f5f7; --muted:#a1a1a6; --line:rgba(245,245,247,.14);
+  --gold:#d8b673; --card:#1c1c1e; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;letter-spacing:-.011em}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px;border-radius:6px}
+h1,h2,h3{text-wrap:balance;margin:0;letter-spacing:-.025em}
+p{margin:0}
+.wrap{max-width:var(--wrap);margin:0 auto;padding-inline:22px}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:20;background:rgba(22,22,23,.78);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);color:#e8e8ed;padding-top:env(safe-area-inset-top,0px)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:48px;gap:16px}
+.brand{display:flex;align-items:baseline;gap:8px;text-decoration:none;white-space:nowrap}
+.brand b{font-weight:600;font-size:17px;letter-spacing:.02em}
+.brand span{font-size:12px;color:#a1a1a6;letter-spacing:.04em}
+.nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:12.5px}
+.nav ul a{text-decoration:none;color:#d2d2d7}
+.nav ul a:hover{color:#fff}
+@media (max-width:640px){.nav ul{gap:16px}.nav ul li.hide-sm{display:none}.brand span{display:none}}
+
+/* hero stage (always dark) */
+.hero{background:var(--stage);color:var(--stage-fg);overflow:hidden;position:relative}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 55% at 50% 62%,rgba(216,182,115,.13),transparent 70%);pointer-events:none}
+.hero-copy{position:relative;text-align:center;padding-block:48px 0}
+.eyebrow{font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+.hero .eyebrow{color:var(--gold-soft)}
+.hero h1{font-size:clamp(44px,7.4vw,84px);font-weight:700;line-height:1.02;margin-top:12px}
+.hero-sub{font-size:clamp(19px,2.3vw,24px);color:#a1a1a6;max-width:34ch;margin:18px auto 0;line-height:1.35;font-weight:500}
+.cta{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-top:22px;font-size:19px}
+.cta a{color:#e3c283;text-decoration:none}
+.cta a:hover{text-decoration:underline}
+.stage{position:relative;height:clamp(420px,66vh,740px);margin-top:-12px}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:default}
+.stage.can-drag canvas{cursor:grab}
+.stage.dragging canvas{cursor:grabbing}
+.fallback{position:absolute;inset:8% 20%;display:none;align-items:center;justify-content:center}
+.fallback img{max-height:100%;border-radius:24px}
+.no-webgl .fallback{display:flex}
+.no-webgl canvas{display:none}
+.drag-hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-size:13px;color:var(--stage-muted);opacity:0;transition:opacity .6s}
+.stage.can-drag .drag-hint{opacity:1}
+.bench{position:relative;display:grid;grid-template-columns:1fr auto;align-items:end;gap:18px 28px;padding-block:6px 44px}
+.caption{min-height:3em;font-size:17px;color:#d2d2d7;max-width:52ch}
+.caption strong{color:#fff;font-weight:600}
+.controls{display:flex;gap:10px}
+.icon-btn{appearance:none;border:0;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);color:#f5f5f7;display:grid;place-items:center;cursor:pointer;transition:background .2s}
+.icon-btn:hover{background:rgba(255,255,255,.2)}
+.icon-btn svg{width:16px;height:16px;fill:currentColor}
+.chapters{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.chap{appearance:none;background:none;border:0;padding:0;text-align:left;color:#86868b;font:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;cursor:pointer}
+.chap .bar{display:block;height:3px;border-radius:2px;background:rgba(255,255,255,.16);margin-bottom:10px;overflow:hidden}
+.chap .bar i{display:block;height:100%;width:calc(var(--p,0)*100%);background:var(--gold-soft)}
+.chap.on{color:#f5f5f7}
+@media (max-width:560px){.bench{grid-template-columns:1fr}.controls{order:-1}.chapters{gap:8px}.chap{font-size:12px}}
+
+/* statement */
+.statement{padding-block:120px 40px}
+.statement p{font-size:clamp(28px,4.4vw,48px);line-height:1.12;font-weight:600;letter-spacing:-.028em;max-width:22ch}
+.statement p span{color:var(--muted)}
+.brands{padding-block:32px 110px}
+.brands small{display:block;font-size:14px;color:var(--muted);margin-bottom:14px;font-weight:500}
+.brands ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 30px;font-size:clamp(22px,3vw,32px);font-weight:600;letter-spacing:-.02em;color:var(--fg)}
+.brands li:not(:last-child)::after{content:"·";margin-left:30px;color:var(--gold)}
+
+/* jason */
+.jason{background:var(--bg-alt);padding-block:110px}
+.jason-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
+.jason h2{font-size:clamp(34px,5vw,56px);line-height:1.05;font-weight:700;margin-top:10px}
+.jason .body{display:grid;gap:18px;margin-top:22px;color:var(--muted);font-size:19px;line-height:1.5;max-width:46ch}
+.jason .body strong{color:var(--fg);font-weight:600}
+.sig{font-family:var(--script);font-size:54px;color:var(--gold);line-height:1;margin-top:26px}
+.sig small{display:block;font-family:var(--sans);font-size:14px;color:var(--muted);margin-top:8px;letter-spacing:0}
+.photos{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:14px}
+.photos figure{margin:0;display:grid;gap:8px;min-width:0}
+.photos img{border-radius:20px;width:100%;height:100%;object-fit:cover}
+.photos .big{grid-column:1/-1}
+.photos .big img{aspect-ratio:16/10}
+.photos .sq img{aspect-ratio:1}
+figcaption{font-size:13px;color:var(--muted);line-height:1.35}
+@media (max-width:860px){.jason-grid{grid-template-columns:1fr}}
+
+/* big number */
+.years{padding-block:110px;text-align:center}
+.years .n{font-size:clamp(110px,22vw,240px);font-weight:700;line-height:.9;letter-spacing:-.06em;background:linear-gradient(180deg,#f3dca6 0%,#c99a4f 46%,#7d5a26 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.years p{font-size:clamp(21px,2.6vw,28px);font-weight:600;margin-top:8px;letter-spacing:-.02em}
+.years p span{color:var(--muted);display:block;font-weight:500;font-size:.72em;margin-top:6px;letter-spacing:-.01em}
+
+/* work */
+.work{padding-block:40px 110px}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap;margin-bottom:36px}
+.section-head h2{font-size:clamp(40px,6vw,64px);font-weight:700;line-height:1}
+.section-head p{color:var(--muted);font-size:19px;max-width:38ch}
+.banner{margin:0 0 16px}
+.banner img{width:100%;border-radius:24px;aspect-ratio:1284/595;object-fit:cover}
+.grid{columns:3 260px;column-gap:16px}
+.grid figure{margin:0 0 16px;break-inside:avoid;display:grid;gap:8px}
+.grid img{width:100%;border-radius:18px;background:var(--card)}
+.grid figcaption{padding-inline:4px}
+.ig-link{display:inline-flex;align-items:center;gap:8px;margin-top:22px;color:var(--gold);text-decoration:none;font-size:17px;font-weight:500}
+.ig-link:hover{text-decoration:underline}
+
+/* services */
+.services{background:var(--bg-alt);padding-block:110px}
+.svc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.svc{background:var(--card);border-radius:24px;padding:34px 32px 36px;display:grid;gap:12px;align-content:start;min-width:0}
+.svc svg{width:40px;height:40px;stroke:var(--gold);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.svc h3{font-size:26px;font-weight:700;margin-top:6px}
+.svc p{color:var(--muted);font-size:17px}
+.svc .meta{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:6px;letter-spacing:.01em}
+@media (max-width:720px){.svc-grid{grid-template-columns:1fr}}
+
+/* visit */
+.visit{padding-block:120px}
+.visit-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:start}
+.visit h2{font-size:clamp(38px,5.6vw,60px);font-weight:700;line-height:1.02}
+.visit .lead{color:var(--muted);font-size:19px;margin-top:18px;max-width:36ch}
+.contact{display:grid;gap:0;border-top:1px solid var(--line)}
+.contact div{display:grid;grid-template-columns:110px 1fr;gap:16px;padding-block:18px;border-bottom:1px solid var(--line);min-width:0}
+.contact dt{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding-top:3px}
+.contact dd{margin:0;font-size:19px;overflow-wrap:anywhere}
+.contact a{text-decoration:none;color:var(--fg)}
+.contact a:hover{color:var(--gold)}
+.buttons{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 22px;border-radius:980px;font-size:17px;text-decoration:none;font-weight:500}
+.btn.primary{background:var(--fg);color:var(--bg)}
+.btn.secondary{border:1px solid var(--line);color:var(--fg)}
+.btn:hover{opacity:.86}
+@media (max-width:820px){.visit-grid{grid-template-columns:1fr}.contact div{grid-template-columns:90px 1fr}}
+
+footer{border-top:1px solid var(--line);padding-block:26px 40px;color:var(--muted);font-size:12.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="#top"><b>CARLIN</b><span>DESIGN &amp; ENGRAVING</span></a>
+    <ul>
+      <li class="hide-sm"><a href="#jason">Jason</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#visit">Visit</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-copy">
+    <div class="eyebrow">Carlin Design &amp; Engraving</div>
+    <h1>Cut by hand.<br>Set by eye.</h1>
+    <p class="hero-sub">Custom rings designed, set and hand engraved by Jason Carlin in Woodbridge, New Jersey.</p>
+    <div class="cta"><a href="#visit">Start a custom ring ›</a><a href="#work">See the work ›</a></div>
+  </div>
+
+  <div class="stage" id="stage">
+    <canvas id="gl" aria-label="3D animation of a custom ring being designed, set with diamonds and hand engraved at Jason Carlin's bench"></canvas>
+    <div class="fallback"><img src="img/w3.jpg" alt="Hand-engraved yellow gold band with a leaf pattern"></div>
+    <div class="drag-hint">Drag to turn the ring</div>
+  </div>
+
+  <div class="wrap bench">
+    <p class="caption" id="caption" aria-live="polite"><strong>Design.</strong> Jason drafts the ring around your hand, your stone and the way you live.</p>
+    <div class="controls">
+      <button class="icon-btn" id="play" aria-label="Pause animation">
+        <svg id="ico-pause" viewBox="0 0 16 16"><rect x="3" y="2" width="3.5" height="12" rx="1"/><rect x="9.5" y="2" width="3.5" height="12" rx="1"/></svg>
+        <svg id="ico-play" viewBox="0 0 16 16" hidden><path d="M4 2.2v11.6c0 .6.7 1 1.2.7l9-5.8a.8.8 0 0 0 0-1.4l-9-5.8C4.7 1.2 4 1.6 4 2.2z"/></svg>
+      </button>
+      <button class="icon-btn" id="replay" aria-label="Replay animation">
+        <svg viewBox="0 0 16 16"><path d="M8 2.5a5.5 5.5 0 1 1-5.2 3.7.75.75 0 1 1 1.4.5A4 4 0 1 0 8 4v1.6c0 .4-.5.7-.8.4L4.6 3.8a.5.5 0 0 1 0-.8L7.2.9c.3-.3.8 0 .8.4v1.2z"/></svg>
+      </button>
+    </div>
+    <div class="chapters" id="chapters"></div>
+  </div>
+</header>
+
+<section class="wrap statement">
+  <p>For more than 27 years, Jason Carlin has made rings the slow way. <span>A graver, a loupe and a steady hand, one cut at a time.</span></p>
+</section>
+
+<section class="wrap brands" aria-label="Brands">
+  <small>Rings designed and engraved for</small>
+  <ul><li>Jared</li><li>Kay</li><li>Blue Nile</li><li>Diamonds Direct</li><li>Brilliant Earth</li></ul>
+</section>
+
+<section class="jason" id="jason">
+  <div class="wrap jason-grid">
+    <div>
+      <div class="eyebrow">The engraver</div>
+      <h2>One bench. One set of hands.</h2>
+      <div class="body">
+        <p>Jason Carlin is a designer and hand engraver who has spent <strong>over 27 years cutting patterns into metal</strong>. He has engraved everything from musical instruments to heirloom weapons, but the work he is known for is the ring you wear every day: <strong>wedding bands and engagement rings</strong>.</p>
+        <p>His designs have been sold by some of the largest names in American jewelry. At his shop inside the Woodbridge Jewelry Exchange, he works directly with you, from the first sketch to the last polish.</p>
+      </div>
+      <div class="sig">Jason Carlin<small>Owner, Carlin Engraving LLC</small></div>
+    </div>
+    <div class="photos">
+      <figure class="big"><img src="img/ig3.jpg" alt="A band held in an engraving block with a hand-cut scroll pattern" loading="lazy"><figcaption>A band in the engraving block, cut from scratch.</figcaption></figure>
+      <figure class="sq"><img src="img/shop.jpg" alt="Jason Carlin at his engraving bench" loading="lazy"><figcaption>Jason at his bench.</figcaption></figure>
+      <figure class="sq"><img src="img/ig11.jpg" alt="The renovated Carlin Engraving shop with an American flag on the wall" loading="lazy"><figcaption>The renovated shop.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="wrap years" aria-label="Experience">
+  <div class="n">27+</div>
+  <p>years of hand engraving.<span>Traditional tools. Techniques that take a lifetime to learn.</span></p>
+</section>
+
+<section class="wrap work" id="work">
+  <div class="section-head">
+    <h2>The work.</h2>
+    <p>Wedding bands, engagement rings and one-of-a-kind pieces, straight from the bench.</p>
+  </div>
+  <figure class="banner"><img src="img/w1.jpg" alt="A row of hand-engraved Carlin bands hanging on a branch" loading="lazy"></figure>
+  <div class="grid">
+    <figure><img src="img/w3.jpg" alt="" loading="lazy"><figcaption>Hand-engraved leaf pattern in yellow gold.</figcaption></figure>
+    <figure><img src="img/ig12.jpg" alt="" loading="lazy"><figcaption>Custom engagement ring.</figcaption></figure>
+    <figure><img src="img/w4.jpg" alt="" loading="lazy"><figcaption>Deep scrollwork, hand cut.</figcaption></figure>
+    <figure><img src="img/w2.jpg" alt="" loading="lazy"><figcaption>Brushed band with channel-set princess diamonds.</figcaption></figure>
+    <figure><img src="img/w8.jpg" alt="" loading="lazy"><figcaption>Paisley engraving between rope edges.</figcaption></figure>
+    <figure><img src="img/ig4.jpg" alt="" loading="lazy"><figcaption>Traditional leaf pattern, hand created and hand engraved.</figcaption></figure>
+    <figure><img src="img/w5.jpg" alt="" loading="lazy"><figcaption>Hammered bands in three metals.</figcaption></figure>
+    <figure><img src="img/w9.jpg" alt="" loading="lazy"><figcaption>Scroll band with milgrain edges.</figcaption></figure>
+    <figure><img src="img/ig9.jpg" alt="" loading="lazy"><figcaption>Designed and hand engraved for a motorcycle club.</figcaption></figure>
+    <figure><img src="img/w7.jpg" alt="" loading="lazy"><figcaption>Bright-cut crosshatch.</figcaption></figure>
+    <figure><img src="img/ig10.jpg" alt="" loading="lazy"><figcaption>Laser-engraved watch back.</figcaption></figure>
+    <figure><img src="img/w6.jpg" alt="" loading="lazy"><figcaption>Hammered finish with a milgrain edge.</figcaption></figure>
+    <figure><img src="img/ig6.jpg" alt="" loading="lazy"><figcaption>Script name on a gold ID bracelet.</figcaption></figure>
+    <figure><img src="img/ig7.jpg" alt="" loading="lazy"><figcaption>Laser script on a steel cake server.</figcaption></figure>
+  </div>
+  <a class="ig-link" href="https://www.instagram.com/carlin_engraving_llc/" target="_blank" rel="noopener">More on Instagram @carlin_engraving_llc ›</a>
+</section>
+
+<section class="services" id="services">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>What Jason makes.</h2>
+      <p>Bring an idea, a sketch, a stone or an heirloom. Leave with something no one else has.</p>
+    </div>
+    <div class="svc-grid">
+      <article class="svc">
+        <svg viewBox="0 0 40 40"><circle cx="20" cy="24" r="11"/><path d="M14 13l6-7 6 7M17 13h6"/><path d="M9 24h22"/></svg>
+        <h3>Custom Design</h3>
+        <p>A bespoke design service that balances artistry and precision, so the finished piece matches what you pictured and then some.</p>
+        <div class="meta">Engagement rings · Wedding bands · Pendants</div>
+      </article>
+      <article class="svc">
+        <svg viewBox="0 0 40 40"><path d="M6 34L26 14"/><path d="M26 14l4-8 4 4-8 4z"/><path d="M8 26c4-1 6 1 5 5"/></svg>
+        <h3>Hand Engraving</h3>
+        <p>Traditional gravers and techniques that carve patterns with real depth and character. Scrollwork, leaves, bright-cut and lettering.</p>
+        <div class="meta">Rings · Buckles · Instruments · Heirlooms</div>
+      </article>
+      <article class="svc">
+        <svg viewBox="0 0 40 40"><rect x="8" y="5" width="24" height="10" rx="2"/><path d="M20 15v9"/><path d="M20 28v2M14 26l-1.5 1.5M26 26l1.5 1.5"/><path d="M6 35h28"/></svg>
+        <h3>Laser Engraving</h3>
+        <p>State-of-the-art laser work on almost any metal, including photographs and fine script.</p>
+        <div class="meta">Steel · Aluminum · Brass · Copper · Titanium · Gold · Silver</div>
+      </article>
+      <article class="svc">
+        <svg viewBox="0 0 40 40"><path d="M5 27c4-8 7-8 8-3s3 5 6-2 6-6 7 0 4 4 9-2"/><path d="M7 33h26"/></svg>
+        <h3>Handwriting Fabrication</h3>
+        <p>Preserve a handwritten note, a signature or a child's drawing as a piece of jewelry, a plaque or a keepsake.</p>
+        <div class="meta">Jewelry · Plaques · Decorative pieces</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="wrap visit" id="visit">
+  <div class="visit-grid">
+    <div>
+      <div class="eyebrow">Visit the bench</div>
+      <h2>Find Jason inside the Woodbridge Jewelry Exchange.</h2>
+      <p class="lead">Call or email before you come in to book time with Jason and talk through your design.</p>
+      <div class="buttons">
+        <a class="btn primary" href="tel:+19084997652">Call 908.499.7652</a>
+        <a class="btn secondary" href="mailto:carlinengravingllc@gmail.com">Email Jason</a>
+      </div>
+    </div>
+    <dl class="contact">
+      <div><dt>Shop</dt><dd>Woodbridge Jewelry Exchange<br>One Woodbridge Center<br>Woodbridge Township, NJ 07095</dd></div>
+      <div><dt>Phone</dt><dd><a href="tel:+19084997652">908.499.7652</a></dd></div>
+      <div><dt>Email</dt><dd><a href="mailto:carlinengravingllc@gmail.com">carlinengravingllc@gmail.com</a></dd></div>
+      <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/carlin_engraving_llc/" target="_blank" rel="noopener">@carlin_engraving_llc</a></dd></div>
+    </dl>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap"><span>Carlin Engraving LLC · Woodbridge Township, New Jersey</span><span>Custom design · Hand engraving · Laser engraving</span></div>
+</footer>
+
+<script>
+/* Chapter UI is built before the 3D module loads so the page is complete even without WebGL. */
+window.CHAPTERS=[
+  {k:'Design', s:0,    e:2.6,  cap:'Jason drafts the ring around your hand, your stone and the way you live.'},
+  {k:'Set',    s:2.6,  e:7.2,  cap:'Each diamond flies home to its seat, and the prongs are pushed over by hand.'},
+  {k:'Engrave',s:7.2,  e:14.6, cap:'A traditional leaf pattern, cut with a hand graver one stroke at a time.'},
+  {k:'Finish', s:14.6, e:18.5, cap:'Milgrain edges, a final polish, and the pattern catches the light.'}
+];
+(function(){
+  const box=document.getElementById('chapters');
+  CHAPTERS.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.className='chap'+(i===0?' on':''); b.type='button'; b.dataset.i=i;
+    b.innerHTML='<span class="bar"><i></i></span>'+c.k;
+    box.appendChild(b);
+  });
+  setTimeout(()=>{ if(!window.__ringReady) document.getElementById('stage').classList.add('no-webgl'); },8000);
+})();
+</script>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const stageEl = document.getElementById('stage');
+const canvas = document.getElementById('gl');
+let renderer;
+try{
+  renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true, powerPreference:'high-performance'});
+}catch(e){ stageEl.classList.add('no-webgl'); throw e; }
+window.__ringReady = true;
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.setClearColor(0x000000, 0);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(30, 1, 0.05, 100);
+
+/* ---------- studio environment: softboxes like a jewelry photo tent ---------- */
+function makeEnv(){
+  const env = new THREE.Scene();
+  env.add(new THREE.Mesh(new THREE.SphereGeometry(30,32,16), (()=>{const m=new THREE.MeshBasicMaterial({color:0xfff4e6, side:THREE.BackSide}); m.color.multiplyScalar(.055); return m;})()));
+  const panel=(w,h,x,y,z,k,col=0xffffff)=>{
+    const m=new THREE.MeshBasicMaterial({color:col, side:THREE.DoubleSide}); m.color.multiplyScalar(k);
+    const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m); p.position.set(x,y,z); p.lookAt(0,0,0); env.add(p);
+  };
+  panel(16,5, 0,13,1, 5.5);            // overhead softbox
+  panel(2.2,16, -11,1,4, 5);           // left strip
+  panel(2.2,16, 11,2,-3, 4);           // right strip
+  panel(10,2.5, 0,-7,8, 2.2, 0xffe0b0); // warm bounce card
+  panel(5,5, 4,4,13, 3.2);             // front key
+  panel(4,10, -5,3,-13, 2.4, 0xdde6ff); // cool back light
+  panel(1.2,1.2, -3,6,9, 14);          // small hot spot for sparkle
+  const pm=new THREE.PMREMGenerator(renderer);
+  const tex=pm.fromScene(env,0.02).texture; pm.dispose(); return tex;
+}
+scene.environment = makeEnv();
+/* ---------- diamond light: a cube map of a jewelry tent (many small softboxes on black) ---------- */
+function makeGemCube(){
+  const env=new THREE.Scene();
+  const bg=new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.BackSide}); bg.color.setScalar(.035);
+  env.add(new THREE.Mesh(new THREE.SphereGeometry(30,32,16),bg));
+  const r=((s)=>()=>{ s=(s*16807)%2147483647; return (s-1)/2147483646; })(11);
+  const box=(w,h,ph,th,k,col)=>{ const m=new THREE.MeshBasicMaterial({color:col||0xffffff,side:THREE.DoubleSide}); m.color.multiplyScalar(k);
+    const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m); p.position.setFromSphericalCoords(18,ph,th); p.lookAt(0,0,0); env.add(p); };
+  box(16,9, .15,0, 2.6);                              // big overhead softbox
+  for(let i=0;i<6;i++) box(1.4,9, 1.1+r()*.5, i*Math.PI/3+r()*.3, 4+r()*3); // strip lights ringing the stone
+  for(let i=0;i<130;i++){ const ph=Math.acos(1-2*Math.pow(r(),1.3)); box(.25+r()*1.1,.25+r()*1.1, ph, r()*Math.PI*2, 3+r()*14, r()<.15?0xffe6c4:0xffffff); }
+  const rt=new THREE.WebGLCubeRenderTarget(512,{type:THREE.HalfFloatType, generateMipmaps:true, minFilter:THREE.LinearMipmapLinearFilter});
+  new THREE.CubeCamera(.1,100,rt).update(renderer,env);
+  return rt.texture;
+}
+const gemCube = makeGemCube();
+const key = new THREE.DirectionalLight(0xfff0d8, 1.6); key.position.set(3,5,4); scene.add(key);
+const rim = new THREE.DirectionalLight(0xcfe0ff, 0.8); rim.position.set(-4,2,-3); scene.add(rim);
+const tipLight = new THREE.PointLight(0xff9a3c, 0, 1.6, 2); scene.add(tipLight);
+
+/* ---------- ring dimensions (1 unit = ring outer radius) ---------- */
+const RO=1.0, RI=0.9, BW=0.36;
+
+/* ---------- hand engraving: vector pattern -> height field -> normal / roughness / color maps ---------- */
+const PW=4096, PH=256, PX0=880, PX1=3216, PMID=2048, PCY=128;
+const TS = (renderer.capabilities.maxTextureSize>=8192 && !matchMedia('(pointer:coarse)').matches) ? 2 : 1;   // texels per pattern unit
+const TW=PW*TS, TH=PH*TS;
+const prims=[];
+const rot=(x,y,a)=>[x*Math.cos(a)-y*Math.sin(a), x*Math.sin(a)+y*Math.cos(a)];
+function groove(pts,w0,w1=w0){ prims.push({k:'g',pts,w0,w1}); }
+function dot(x,y,r){ prims.push({k:'d',x,y,r}); }
+// an acanthus leaf: curled centerline, scalloped edge, one bright-cut facet plus shading cuts
+function leaf(bx,by,ang,len,wid,curl,lobes=3){
+  const [dx,dy]=[Math.cos(ang),Math.sin(ang)];
+  const [cx,cy]=rot(dx*len*.55,dy*len*.55,curl*.9);
+  const [tx,ty]=rot(dx*len,dy*len,curl*1.6);
+  const N=28, C=[], A=[], B=[];
+  for(let i=0;i<=N;i++){
+    const t=i/N, u=1-t;
+    const x=bx+2*u*t*cx+t*t*tx, y=by+2*u*t*cy+t*t*ty;
+    const gx=2*u*cx+2*t*(tx-cx), gy=2*u*cy+2*t*(ty-cy), gl=Math.hypot(gx,gy)||1;
+    const nx=-gy/gl, ny=gx/gl;
+    const w=wid*Math.pow(Math.sin(Math.PI*Math.pow(t,.8)),.85);
+    const wa=w*(1-.3*Math.pow(Math.abs(Math.sin(t*Math.PI*lobes)),.6)*(t>.12?1:0));
+    C.push([x,y,nx,ny,wa,gx/gl,gy/gl]); A.push([x+nx*wa,y+ny*wa]); B.push([x-nx*w*.8,y-ny*w*.8]);
+  }
+  const m=C[N>>1];
+  prims.push({k:'f',poly:A.concat(B.reverse()),g0:[m[0]+m[2]*wid,m[1]+m[3]*wid],g1:[m[0]-m[2]*wid,m[1]-m[3]*wid]});
+  groove(A,2.6,1.6); groove(B.slice().reverse(),2.2,1.4);
+  groove(C.slice(2,Math.round(N*.86)).map(c=>[c[0],c[1]]),2.4,1.2);
+  for(let i=4;i<N-3;i+=3){ const c=C[i]; groove([[c[0],c[1]],[c[0]+c[2]*c[4]*.88+c[5]*len*.05, c[1]+c[3]*c[4]*.88+c[6]*len*.05]],1.5,1.0); }
+}
+function spiral(C,r0,a0,turns,dirSign,w0,w1){
+  const k=Math.log(r0/6)/(turns*2*Math.PI), pts=[];
+  for(let i=0;i<=120;i++){ const th=i/120*turns*2*Math.PI; const r=r0*Math.exp(-k*th); const a=a0+dirSign*th; pts.push([C[0]+Math.cos(a)*r,C[1]+Math.sin(a)*r]); }
+  groove(pts,w0,w1); const e=pts[pts.length-1]; dot(e[0],e[1],4.2);
+  return {k,a0,r0,C,dirSign};
+}
+(function buildPattern(){
+  const XS=PX0+30, P=300, A=34, XE=XS+7*P/2;
+  const stemY=x=>PCY-A*Math.sin(2*Math.PI*(x-XS)/P);
+  const stem=[]; for(let x=XS;x<=XE;x+=4) stem.push([x,stemY(x)]);
+  groove(stem,7,7);
+  spiral([XS-4,PCY+14],18,-Math.PI/2+.3,1.2,-1,4,2.5);           // starting curl
+  for(let m=0;m<7;m++){
+    const xc=XS+P/4+m*P/2, s=m%2===0?1:-1;                      // s=1: crest at top, scroll hangs below
+    const Bx=xc+30, By=stemY(Bx), C=[xc+8,PCY+s*26];
+    const a0=Math.atan2(By-C[1],Bx-C[0]), r0=Math.hypot(Bx-C[0],By-C[1]);
+    const sp=spiral(C,r0,a0,1.55,s,6.2,2.6);
+    for(const f of [.22,.45,.68,.92,1.18,1.42]){                           // leaves curling inside the scroll
+      const th=f*Math.PI*2*.72, r=r0*Math.exp(-sp.k*th), a=a0+s*th;
+      const px=C[0]+Math.cos(a)*r, py=C[1]+Math.sin(a)*r;
+      leaf(px,py,a+Math.PI+s*.95, r*1.05, Math.max(6,r*.27), s*.6, 3);
+    }
+    const cyv=stemY(xc);                                        // leaves sprouting off the crest toward the border
+    leaf(xc-6,cyv,-s*Math.PI/2-.95,64,13,-.5*s,3);
+    leaf(xc-40,stemY(xc-40),-s*Math.PI/2-1.35,46,10,-.4*s,3);
+    leaf(xc+10,cyv,-s*Math.PI/2+.75,54,11,.45*s,3);
+  }
+  // mirror everything to the right half
+  const n=prims.length;
+  for(let i=0;i<n;i++){ const p=prims[i], mx=q=>[2*PMID-q[0],q[1]];
+    if(p.k==='g') prims.push({k:'g',pts:p.pts.map(mx),w0:p.w0,w1:p.w1});
+    else if(p.k==='f') prims.push({k:'f',poly:p.poly.map(mx),g0:mx(p.g0),g1:mx(p.g1)});
+    else prims.push({k:'d',x:2*PMID-p.x,y:p.y,r:p.r}); }
+  // center rosette joining the two halves
+  groove([[XE,PCY],[PMID-26,PCY]],7); groove([[2*PMID-XE,PCY],[PMID+26,PCY]],7);
+  for(let i=0;i<6;i++){ const a=-Math.PI/2+i*Math.PI/3; leaf(PMID+Math.cos(a)*14,PCY+Math.sin(a)*14,a,i%3===0?72:84,19,.25,3); }
+  dot(PMID,PCY,11);
+  // double border frame
+  for(const y of [22,34,222,234]) groove([[PX0-24,y],[PX1+24,y]], y===22||y===234?3.4:2.4);
+  for(const x of [PX0-24,PX1+24]) groove([[x,22],[x,234]],3.4);
+})();
+
+const heightC=document.createElement('canvas'); heightC.width=TW; heightC.height=TH;
+const roughC=document.createElement('canvas'); roughC.width=TW; roughC.height=TH;
+const maskC=document.createElement('canvas'); maskC.width=TW; maskC.height=TH;
+(function rasterize(){
+  const h=heightC.getContext('2d'), r=roughC.getContext('2d'), m=maskC.getContext('2d');
+  h.fillStyle='#fff'; h.fillRect(0,0,TW,TH); r.fillStyle='#4d4d4d'; r.fillRect(0,0,TW,TH); m.fillStyle='#000'; m.fillRect(0,0,TW,TH);
+  r.fillStyle='#adadad'; r.fillRect((PX0-24)*TS,22*TS,(PX1-PX0+48)*TS,212*TS);   // matte florentine ground
+  for(const g of [h,r,m]){ g.setTransform(TS,0,0,TS,0,0); g.lineCap='round'; g.lineJoin='round'; }
+  h.globalCompositeOperation='darken';
+  const grey=v=>{ const c=Math.round(v*255); return `rgb(${c},${c},${c})`; };
+  const pathOf=(g,poly)=>{ g.beginPath(); g.moveTo(poly[0][0],poly[0][1]); for(const q of poly) g.lineTo(q[0],q[1]); g.closePath(); };
+  for(const p of prims){
+    if(p.k==='f'){
+      const gr=h.createLinearGradient(p.g0[0],p.g0[1],p.g1[0],p.g1[1]); gr.addColorStop(0,grey(.42)); gr.addColorStop(1,grey(.9));
+      pathOf(h,p.poly); h.fillStyle=gr; h.fill();
+      pathOf(r,p.poly); r.fillStyle='#2a2a2a'; r.fill();
+      pathOf(m,p.poly); m.fillStyle='#fff'; m.fill();
+    }else if(p.k==='d'){
+      const gr=h.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r); gr.addColorStop(0,grey(.25)); gr.addColorStop(1,grey(.95));
+      h.fillStyle=gr; h.beginPath(); h.arc(p.x,p.y,p.r,0,7); h.fill();
+      for(const g of [r,m]){ g.fillStyle=g===r?'#333':'#fff'; g.beginPath(); g.arc(p.x,p.y,p.r,0,7); g.fill(); }
+    }
+  }
+  for(const p of prims){ if(p.k!=='g') continue;
+    const n=p.pts.length;
+    for(const [f,v] of [[1,.78],[.7,.55],[.42,.33],[.18,.16]]){   // stacked passes give a V-shaped cut
+      h.strokeStyle=grey(v);
+      for(let i=1;i<n;i++){ h.lineWidth=(p.w0+(p.w1-p.w0)*i/(n-1))*f; h.beginPath(); h.moveTo(p.pts[i-1][0],p.pts[i-1][1]); h.lineTo(p.pts[i][0],p.pts[i][1]); h.stroke(); }
+    }
+    for(const g of [r,m]){ g.strokeStyle=g===r?'#3a3a3a':'#fff';
+      for(let i=1;i<n;i++){ g.lineWidth=p.w0+(p.w1-p.w0)*i/(n-1); g.beginPath(); g.moveTo(p.pts[i-1][0],p.pts[i-1][1]); g.lineTo(p.pts[i][0],p.pts[i][1]); g.stroke(); } }
+  }
+})();
+const normTex=(function(){
+  const H=heightC.getContext('2d').getImageData(0,0,TW,TH).data;
+  const Rg=roughC.getContext('2d').getImageData(0,0,TW,TH).data;
+  const M=maskC.getContext('2d').getImageData(0,0,TW,TH).data;
+  const hf=new Float32Array(TW*TH); for(let i=0;i<TW*TH;i++) hf[i]=H[i*4]/255;
+  const x0=Math.max(1,(PX0-40)*TS), x1=Math.min(TW-2,(PX1+40)*TS), y0=18*TS, y1=238*TS;
+  let s=5; const rnd=()=>{ s=(s*16807)%2147483647; return s/2147483647; };
+  for(let y=y0;y<y1;y++) for(let x=x0;x<x1;x++){ const i=y*TW+x; if(M[i*4]<10 && y>24*TS && y<232*TS && x>(PX0-22)*TS && x<(PX1+22)*TS) hf[i]-=rnd()*.07; }
+  const bl=hf.slice();                                          // soften the stepped passes
+  for(let y=y0;y<y1;y++) for(let x=x0;x<x1;x++){ const i=y*TW+x; bl[i]=(hf[i]*4+hf[i-1]+hf[i+1]+hf[i-TW]+hf[i+TW])/8; }
+  const nrm=new Uint8Array(TW*TH*4), col=new Uint8Array(TW*TH*4), dat=new Uint8Array(TW*TH*4);
+  const K=3.4/TS;
+  for(let y=0;y<TH;y++){ const ty=TH-1-y;
+    for(let x=0;x<TW;x++){ const i=y*TW+x, o=(ty*TW+x)*4;
+      let nx=0, ny=0;
+      if(x>x0 && x<x1-1 && y>y0 && y<y1-1){ nx=-(bl[i+1]-bl[i-1])*.5*K*TS*TS; ny=(bl[i+TW]-bl[i-TW])*.5*K*TS*TS; }
+      const l=Math.hypot(nx,ny,1);
+      nrm[o]=(nx/l*.5+.5)*255; nrm[o+1]=(ny/l*.5+.5)*255; nrm[o+2]=(1/l*.5+.5)*255; nrm[o+3]=255;
+      const depth=1-Math.min(1,bl[i]);
+      const c=255*(1-.22*Math.pow(depth,1.2))*(Rg[i*4]>150?.97:1);
+      col[o]=col[o+1]=col[o+2]=c; col[o+3]=255;
+      dat[o]=M[i*4]; dat[o+1]=Rg[i*4]; dat[o+2]=0; dat[o+3]=255;
+    }
+  }
+  const mk=(d,cs)=>{ const t=new THREE.DataTexture(d,TW,TH,THREE.RGBAFormat); t.colorSpace=cs; t.generateMipmaps=true; t.minFilter=THREE.LinearMipmapLinearFilter; t.magFilter=THREE.LinearFilter; t.wrapS=THREE.RepeatWrapping; t.anisotropy=renderer.capabilities.getMaxAnisotropy(); t.needsUpdate=true; return t; };
+  window.__engr={col:mk(col,THREE.SRGBColorSpace), dat:mk(dat,THREE.NoColorSpace)};
+  // for each pattern column, the rows where metal is cut: the graver tip hops between them
+  window.__cutRows=[]; for(let x=0;x<PW;x+=2){ const rows=[]; for(let y=30;y<226;y+=3){ if(M[((y*TS)*TW+x*TS)*4]>128) rows.push(y); } window.__cutRows[x>>1]=rows; }
+  return mk(nrm,THREE.NoColorSpace);
+})();
+const colTex=window.__engr.col, datTex=window.__engr.dat;
+
+/* ---------- materials ---------- */
+const GOLD = new THREE.Color().setRGB(1.0, 0.74, 0.36);
+const eng = { uCursor:{value:0}, uGlow:{value:0}, uSweep:{value:-1}, uSweepAmt:{value:0} };
+const bandMat = new THREE.MeshPhysicalMaterial({color:GOLD, metalness:1, roughness:.5, map:colTex,
+  normalMap:normTex, normalScale:new THREE.Vector2(1,1), roughnessMap:datTex,
+  emissiveMap:datTex, emissive:new THREE.Color(1.0,.46,.14), emissiveIntensity:3.2});
+bandMat.onBeforeCompile = (sh)=>{
+  Object.assign(sh.uniforms, eng);
+  sh.fragmentShader = 'uniform float uCursor;\nuniform float uGlow;\nuniform float uSweep;\nuniform float uSweepAmt;\n' + sh.fragmentShader
+  .replace('#include <map_fragment>', `
+#ifdef USE_MAP
+  vec4 sampledDiffuseColor = texture2D( map, vMapUv );
+  diffuseColor *= mix( vec4(1.0), sampledDiffuseColor, step( vMapUv.x, uCursor ) );
+#endif`)
+  .replace('#include <roughnessmap_fragment>', `
+float roughnessFactor = roughness;
+#ifdef USE_ROUGHNESSMAP
+  roughnessFactor *= mix( 0.3, texture2D( roughnessMap, vRoughnessMapUv ).g, step( vRoughnessMapUv.x, uCursor ) );
+#endif`)
+  .replace('#include <normal_fragment_maps>', `
+#ifdef USE_NORMALMAP_TANGENTSPACE
+  vec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;
+  mapN = mix( vec3( 0.0, 0.0, 1.0 ), mapN, step( vNormalMapUv.x, uCursor ) );
+  mapN.xy *= normalScale;
+  normal = normalize( tbn * mapN );
+#endif`)
+  .replace('#include <emissivemap_fragment>', `
+#ifdef USE_EMISSIVEMAP
+  float emk = texture2D( emissiveMap, vEmissiveMapUv ).r;
+  float eu = vEmissiveMapUv.x;
+  float behind = uCursor - eu;
+  float trail = behind >= 0.0 ? exp( -behind * 55.0 ) : 0.0;
+  float sw = exp( -pow( ( eu - uSweep ) * 20.0, 2.0 ) );
+  totalEmissiveRadiance *= emk * ( trail * uGlow + sw * uSweepAmt );
+#endif`);
+};
+const goldMat = new THREE.MeshPhysicalMaterial({color:GOLD, metalness:1, roughness:.14});
+const platMat = new THREE.MeshPhysicalMaterial({color:new THREE.Color(.9,.91,.94), metalness:1, roughness:.16, envMapIntensity:1.5});
+
+/* ---------- round brilliant diamond: 57 facets, ray traced inside the stone ---------- */
+function brilliant(){
+  const g=.012, ca=34.5*Math.PI/180, pa=40.75*Math.PI/180, tv=.57/Math.cos(Math.PI/8);
+  const P=(r,a,y)=>new THREE.Vector3(r*Math.cos(a),y,r*Math.sin(a));
+  const crownY=x=>g+(1-x)*Math.tan(ca), pavY=x=>-g-(1-x)*Math.tan(pa);
+  const hT=crownY(tv), tris=[];
+  const T=i=>P(tv,i*Math.PI/4,hT);
+  const rs=.57+.5*(1-.57), S=i=>{ const a=i*Math.PI/4+Math.PI/8; return P(rs,a,crownY(rs*Math.cos(Math.PI/8))); };
+  const Gt=k=>P(1,k*Math.PI/8,g), Gb=k=>P(1,k*Math.PI/8,-g);
+  const rl=.23, L=i=>{ const a=i*Math.PI/4+Math.PI/8; return P(rl,a,pavY(rl*Math.cos(Math.PI/8))); };
+  const cul=new THREE.Vector3(0,pavY(0),0), top=new THREE.Vector3(0,hT,0);
+  for(let i=0;i<8;i++){
+    const j=(i+1)%8, k0=2*i, k1=2*i+1, k2=(2*i+2)%16;
+    tris.push([top,T(i),T(j)]);                     // table
+    tris.push([T(i),T(j),S(i)]);                    // star
+    tris.push([T(i),S((i+7)%8),Gt(k0)],[T(i),Gt(k0),S(i)]); // kite (bezel)
+    tris.push([S(i),Gt(k0),Gt(k1)],[S(i),Gt(k1),Gt(k2)]);   // upper girdle
+    tris.push([cul,L((i+7)%8),Gb(k0)],[cul,Gb(k0),L(i)]);   // pavilion main
+    tris.push([L(i),Gb(k0),Gb(k1)],[L(i),Gb(k1),Gb(k2)]);   // lower girdle
+  }
+  for(let k=0;k<16;k++){ const k2=(k+1)%16; tris.push([Gt(k),Gb(k),Gb(k2)],[Gt(k),Gb(k2),Gt(k2)]); } // girdle
+  const pos=[], planes=[];
+  const c=new THREE.Vector3(0,-.25,0);
+  for(const t of tris){
+    const n=new THREE.Vector3().subVectors(t[1],t[0]).cross(new THREE.Vector3().subVectors(t[2],t[0])).normalize();
+    const ctr=t[0].clone().add(t[1]).add(t[2]).multiplyScalar(1/3);
+    if(n.dot(ctr.clone().sub(c))<0){ n.negate(); t.reverse(); }
+    for(const v of t) pos.push(v.x,v.y,v.z);
+    const w=n.dot(t[0]);
+    if(!planes.some(p=>p.x*n.x+p.y*n.y+p.z*n.z>.99995 && Math.abs(p.w-w)<1e-4)) planes.push(new THREE.Vector4(n.x,n.y,n.z,w));
+  }
+  const geo=new THREE.BufferGeometry(); geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); geo.computeVertexNormals();
+  return {geo,planes};
+}
+const BR=brilliant();
+const planeArr=Array.from({length:80},(_,i)=>BR.planes[i]||new THREE.Vector4(0,1,0,99));
+const stoneMat=new THREE.ShaderMaterial({
+  uniforms:{uEnv:{value:gemCube}, uPlanes:{value:planeArr}, uCount:{value:BR.planes.length}, uIor:{value:2.418}, uDisp:{value:.028}},
+  vertexShader:`
+    varying vec3 vPos; varying vec3 vN; varying vec3 vCam; varying vec3 vR0; varying vec3 vR1; varying vec3 vR2;
+    void main(){
+      vPos=position; vN=normal;
+      vCam=(inverse(modelMatrix)*vec4(cameraPosition,1.0)).xyz;
+      mat3 m=mat3(modelMatrix); vR0=normalize(m[0]); vR1=normalize(m[1]); vR2=normalize(m[2]);
+      gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);
+    }`,
+  fragmentShader:`
+    uniform samplerCube uEnv; uniform vec4 uPlanes[80]; uniform int uCount; uniform float uIor; uniform float uDisp;
+    varying vec3 vPos; varying vec3 vN; varying vec3 vCam; varying vec3 vR0; varying vec3 vR1; varying vec3 vR2;
+    vec3 env(vec3 d){ return textureCube(uEnv, normalize(mat3(vR0,vR1,vR2)*d)).rgb; }
+    float fres(float c,float n1,float n2){ float r=(n1-n2)/(n1+n2); r*=r; return r+(1.0-r)*pow(1.0-clamp(c,0.0,1.0),5.0); }
+    void main(){
+      vec3 V=normalize(vPos-vCam), N=normalize(vN);
+      if(dot(V,N)>0.0) N=-N;
+      float Fr=fres(dot(-V,N),1.0,uIor);
+      vec3 col=env(reflect(V,N))*Fr;
+      vec3 d=refract(V,N,1.0/uIor), p=vPos;
+      float att=1.0-Fr;
+      for(int b=0;b<7;b++){
+        float tmin=1e5; vec3 nE=vec3(0.0,1.0,0.0);
+        for(int i=0;i<80;i++){ if(i>=uCount) break;
+          vec3 n=uPlanes[i].xyz; float dn=dot(d,n);
+          if(dn>1e-5){ float t=(uPlanes[i].w-dot(p,n))/dn; if(t<tmin){ tmin=t; nE=n; } } }
+        p+=d*max(tmin,0.0);
+        vec3 oG=refract(d,-nE,uIor);
+        if(dot(oG,oG)>1e-6){
+          vec3 oR=refract(d,-nE,uIor-uDisp), oB=refract(d,-nE,uIor+uDisp);
+          float F=fres(abs(dot(oG,nE)),1.0,uIor);
+          vec3 tr=vec3(dot(oR,oR)>1e-6?env(oR).r:0.0, env(oG).g, dot(oB,oB)>1e-6?env(oB).b:0.0);
+          col+=att*(1.0-F)*tr; att*=F;
+        }
+        d=reflect(d,-nE);
+      }
+      col+=att*env(d)*.6;
+      gl_FragColor=vec4(col,1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }`
+});
+const metalMats=[bandMat,goldMat,platMat];
+
+/* ---------- scene graph: pivot (pose) > spin (roll around ring axis) ---------- */
+const pivot = new THREE.Group(); scene.add(pivot);
+const spin = new THREE.Group(); pivot.add(spin);
+
+// band
+const outerGeo = new THREE.CylinderGeometry(RO,RO,BW,512,1,true,Math.PI,Math.PI*2); outerGeo.rotateX(Math.PI/2);
+spin.add(new THREE.Mesh(outerGeo, bandMat));
+const innerGeo = new THREE.CylinderGeometry(RI,RI,BW,256,1,true); innerGeo.rotateX(Math.PI/2);
+spin.add(new THREE.Mesh(innerGeo, new THREE.MeshPhysicalMaterial({color:GOLD,metalness:1,roughness:.12,side:THREE.BackSide})));
+metalMats.push(spin.children[1].material);
+for(const s of [1,-1]){
+  const r=new THREE.Mesh(new THREE.RingGeometry(RI,RO-.01,256), goldMat); r.position.z=s*BW/2; if(s<0) r.rotation.y=Math.PI; spin.add(r);
+  const t=new THREE.Mesh(new THREE.TorusGeometry(RO-.008,.013,12,384), goldMat); t.position.z=s*(BW/2-.008); spin.add(t);
+}
+// milgrain beads
+const MG=300;
+const beads = new THREE.InstancedMesh(new THREE.SphereGeometry(.0115,10,8), goldMat, MG*2);
+spin.add(beads);
+const beadInfo=[];
+for(const s of [1,-1]) for(let i=0;i<MG;i++){ const a=Math.PI/2+i/MG*Math.PI*2; const fromTop=Math.abs(Math.atan2(Math.sin(a-Math.PI/2),Math.cos(a-Math.PI/2))); beadInfo.push({a, z:s*(BW/2-.03), d:fromTop/Math.PI}); }
+const _m=new THREE.Matrix4(), _q=new THREE.Quaternion(), _s=new THREE.Vector3(), _p=new THREE.Vector3();
+function setBeads(k){ // k(d) -> scale
+  beadInfo.forEach((b,i)=>{ const sc=k(b.d); _p.set(Math.cos(b.a)*(RO+.003), Math.sin(b.a)*(RO+.003), b.z); _s.setScalar(sc); _m.compose(_p,_q,_s); beads.setMatrixAt(i,_m); });
+  beads.instanceMatrix.needsUpdate=true;
+}
+
+// diamond geometry (round brilliant approximation, faceted by flat shading)
+const diaGeo = BR.geo;
+
+// head: basket + prongs
+const RG=.2, YG=RO+.86*RG+.06;
+const head=new THREE.Group(); spin.add(head);
+const bask1=new THREE.Mesh(new THREE.TorusGeometry(.085,.014,10,48), platMat); bask1.rotation.x=Math.PI/2; bask1.position.y=RO+.09; head.add(bask1);
+const bask2=new THREE.Mesh(new THREE.TorusGeometry(.15,.014,10,64), platMat); bask2.rotation.x=Math.PI/2; bask2.position.y=YG-.055; head.add(bask2);
+const prongs=[]; const PR_ANG=[0,1,2,3].map(i=>Math.PI/4+i*Math.PI/2);
+for(const a of PR_ANG){ const m=new THREE.Mesh(new THREE.BufferGeometry(), platMat); const tip=new THREE.Mesh(new THREE.SphereGeometry(.024,12,10), platMat); head.add(m,tip); prongs.push({a,m,tip}); }
+let lastOpen=-1;
+function setProngs(open){
+  open=Math.round(open*200)/200; if(open===lastOpen) return; lastOpen=open;
+  for(const p of prongs){
+    const c=Math.cos(p.a), s=Math.sin(p.a);
+    const tipR=THREE.MathUtils.lerp(.165,.33,open), tipY=THREE.MathUtils.lerp(YG+.058,YG+.1,open);
+    const pts=[[.06,RO-.01],[.12,RO+.1],[.207,YG],[tipR,tipY]].map(([r,y])=>new THREE.Vector3(r*c,y,r*s));
+    p.m.geometry.dispose(); p.m.geometry=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),24,.017,8,false);
+    p.tip.position.copy(pts[3]);
+  }
+}
+setProngs(1);
+
+// stones
+const stones=[];
+function rand(seed){ let s=seed; return ()=>{ s=(s*16807)%2147483647; return (s-1)/2147483646; }; }
+const R=rand(7);
+const PAVE=[]; for(let i=0;i<5;i++) for(const sd of [1,-1]) PAVE.push({d:sd*(.36+i*.155), i});
+PAVE.sort((a,b)=>a.i-b.i);
+PAVE.forEach((p,k)=>{
+  const a=Math.PI/2+p.d, n=new THREE.Vector3(Math.cos(a),Math.sin(a),0);
+  const size=.047;
+  const target=n.clone().multiplyScalar(RO-.004);
+  const q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),n);
+  stones.push({size, target, q, t0:2.75+k*.2, dur:1.25});
+  // tiny beads that hold each pavé stone
+  for(const z of [.06,-.06]){ const b=new THREE.Mesh(new THREE.SphereGeometry(.013,8,6),platMat); const aa=a+Math.sign(p.d)*.0775; b.position.set(Math.cos(aa)*(RO+.004),Math.sin(aa)*(RO+.004),z); spin.add(b); }
+});
+stones.push({size:RG, target:new THREE.Vector3(0,YG,0), q:new THREE.Quaternion(), t0:5.0, dur:1.55, center:true});
+const glintTex=(()=>{ const c=document.createElement('canvas'); c.width=c.height=128; const g=c.getContext('2d');
+  const r=g.createRadialGradient(64,64,0,64,64,64); r.addColorStop(0,'rgba(255,255,255,1)'); r.addColorStop(.12,'rgba(255,250,235,.8)'); r.addColorStop(.4,'rgba(255,240,210,.12)'); r.addColorStop(1,'rgba(255,240,210,0)');
+  g.fillStyle=r; g.fillRect(0,0,128,128);
+  g.globalCompositeOperation='lighter';
+  for(const [w,h] of [[128,3],[3,128]]){ const lg=g.createLinearGradient(w>h?0:64,w>h?64:0,w>h?128:64,w>h?64:128); lg.addColorStop(0,'rgba(255,255,255,0)'); lg.addColorStop(.5,'rgba(255,255,255,.95)'); lg.addColorStop(1,'rgba(255,255,255,0)'); g.fillStyle=lg; g.fillRect(64-w/2,64-h/2,w,h); }
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t; })();
+const camDir0 = new THREE.Vector3(0,.22,1).normalize();
+stones.forEach((st,i)=>{
+  st.mesh=new THREE.Mesh(diaGeo, stoneMat); st.mesh.scale.setScalar(st.size); spin.add(st.mesh);
+  // start far away, many of them from the viewer's side, so they fly toward the ring
+  const ang=R()*Math.PI*2, el=(R()-.35)*1.6;
+  st.start = st.center ? new THREE.Vector3(.4,3.4,5.5) : new THREE.Vector3(Math.cos(ang)*6, el*3+1, Math.sin(ang)*4+3.5);
+  st.swirl = new THREE.Vector3(R()-.5,R()-.2,R()-.5).multiplyScalar(2.2);
+  st.axis = new THREE.Vector3(R()-.5,R()-.5,R()-.5).normalize();
+  st.qFinal = st.q.clone().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), R()*Math.PI));
+  const sm=new THREE.SpriteMaterial({map:glintTex, blending:THREE.AdditiveBlending, depthWrite:false, transparent:true, opacity:0});
+  st.glint=new THREE.Sprite(sm); spin.add(st.glint); st.ph=R()*10; st.w=1.3+R()*2.2;
+  st.flash=new THREE.Sprite(sm.clone()); spin.add(st.flash);
+});
+
+// design wireframe
+const wireMat=new THREE.LineBasicMaterial({color:0xe7c88c, transparent:true, opacity:0});
+const wg=new THREE.CylinderGeometry(RO,RO,BW,72,4,true); wg.rotateX(Math.PI/2);
+const bandWire=new THREE.LineSegments(new THREE.WireframeGeometry(wg), wireMat); spin.add(bandWire);
+const wg2=new THREE.CylinderGeometry(RI,RI,BW,72,1,true); wg2.rotateX(Math.PI/2);
+const innerWire=new THREE.LineSegments(new THREE.WireframeGeometry(wg2), wireMat); spin.add(innerWire);
+const stoneWire=new THREE.LineSegments(new THREE.EdgesGeometry(diaGeo,1), wireMat); stoneWire.scale.setScalar(RG); stoneWire.position.set(0,YG,0); spin.add(stoneWire);
+const wires=[bandWire,innerWire,stoneWire].map(w=>({w,n:w.geometry.attributes.position.count}));
+
+// hand graver: steel square shank + mushroom handle; tip at local origin, shank along +X
+const graver=new THREE.Group(); scene.add(graver);
+{
+  const steel=new THREE.MeshPhysicalMaterial({color:0xcfd3d8,metalness:1,roughness:.22});
+  const shank=new THREE.Mesh(new THREE.BoxGeometry(.95,.036,.036), steel); shank.position.x=.08+.475; graver.add(shank);
+  const face=new THREE.Mesh(new THREE.ConeGeometry(.026,.1,4), steel); face.rotation.z=Math.PI/2; face.rotation.x=Math.PI/4; face.position.x=.05; graver.add(face);
+  const wood=new THREE.MeshPhysicalMaterial({color:0x7a4a26,metalness:0,roughness:.45,clearcoat:.6,clearcoatRoughness:.3});
+  const hp=[[.001,0],[.03,0],[.035,.05],[.05,.12],[.1,.22],[.13,.3],[.12,.34],[.001,.345]].map(([x,y])=>new THREE.Vector2(x,y));
+  const handle=new THREE.Mesh(new THREE.LatheGeometry(hp,32), wood); handle.rotation.z=-Math.PI/2; handle.position.x=.98; graver.add(handle);
+  const ferrule=new THREE.Mesh(new THREE.CylinderGeometry(.036,.036,.05,24), new THREE.MeshPhysicalMaterial({color:0xd9b56a,metalness:1,roughness:.2})); ferrule.rotation.z=Math.PI/2; ferrule.position.x=.98; graver.add(ferrule);
+}
+graver.visible=false;
+
+// metal chips thrown off by the graver
+const CH_N=420;
+const chipGeo=new THREE.BufferGeometry();
+const chipPos=new Float32Array(CH_N*3), chipCol=new Float32Array(CH_N*3);
+chipGeo.setAttribute('position',new THREE.BufferAttribute(chipPos,3));
+chipGeo.setAttribute('color',new THREE.BufferAttribute(chipCol,3));
+const dotTex=(()=>{ const c=document.createElement('canvas'); c.width=c.height=32; const g=c.getContext('2d'); const r=g.createRadialGradient(16,16,0,16,16,16); r.addColorStop(0,'#fff'); r.addColorStop(.35,'rgba(255,220,160,.8)'); r.addColorStop(1,'rgba(255,200,120,0)'); g.fillStyle=r; g.fillRect(0,0,32,32); return new THREE.CanvasTexture(c); })();
+const chips=new THREE.Points(chipGeo,new THREE.PointsMaterial({size:.035,map:dotTex,vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+scene.add(chips);
+const chipState=Array.from({length:CH_N},()=>({life:0,max:1,v:new THREE.Vector3(),p:new THREE.Vector3()}));
+let chipIdx=0, chipAcc=0;
+function resetChips(){ chipState.forEach(c=>c.life=0); }
+
+/* ---------- timeline helpers ---------- */
+const clamp01=x=>Math.min(1,Math.max(0,x));
+const seg=(t,a,b)=>clamp01((t-a)/(b-a));
+const eio=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const eout=x=>1-Math.pow(1-x,3);
+const lerp=THREE.MathUtils.lerp;
+const END=18.5, CUT0=7.9, CUT1=14.0, U0=.205, U1=.795;
+const POSE_BEAUTY=new THREE.Euler(.3,-.62,0), POSE_ENG=new THREE.Euler(.1,-1.18,0), POSE_FINAL=new THREE.Euler(-.12,-.78,0);
+
+// angle (in ring plane) that faces the camera while in the engraving pose
+const qEng=new THREE.Quaternion().setFromEuler(POSE_ENG);
+const camLocal=camDir0.clone().applyQuaternion(qEng.clone().invert());
+const PHI=Math.atan2(camLocal.y,camLocal.x);
+const sTrack=u=>PHI-Math.PI/2-2*Math.PI*u;
+const wrapPI=a=>Math.atan2(Math.sin(a),Math.cos(a));
+const K=wrapPI(sTrack(U0))-sTrack(U0);
+const S_A=sTrack(U0)+K, S_E=sTrack(U1)+K, S_F=Math.floor(S_E/(Math.PI*2))*Math.PI*2;
+
+const tmpV=new THREE.Vector3(), tmpV2=new THREE.Vector3(), tmpQ=new THREE.Quaternion();
+let baseDist=7;
+
+function surfaceLocal(u,v,out){ const a=Math.PI/2+2*Math.PI*u; return out.set(Math.cos(a)*RO, Math.sin(a)*RO, (v-.5)*BW); }
+
+let dragYaw=0, idleT=0, tipY=128;
+
+function update(t, dt){
+  /* pose */
+  const toEng=eio(seg(t,6.8,7.7)), back=eio(seg(t,14.3,16.2)), w=toEng*(1-back);
+  const introYaw=(1-eout(seg(t,0,2.6)))*.9;
+  const idle = t>=END;
+  const A = t<10 ? POSE_BEAUTY : POSE_FINAL;
+  pivot.rotation.set(lerp(A.x,POSE_ENG.x,w), lerp(A.y,POSE_ENG.y,w)+introYaw+(idle?dragYaw+Math.sin(idleT*.45)*.16:0), 0);
+  pivot.scale.setScalar(lerp(.86,1,eout(seg(t,0,2.4))));
+  pivot.position.y = idle ? Math.sin(idleT*.9)*.02 : 0;
+
+  /* spin around the ring's own axis */
+  let s;
+  if(t<2.6) s=lerp(-2.4,0,eout(seg(t,0,2.6)));
+  else if(t<7.2) s=0;
+  else if(t<CUT0) s=lerp(0,S_A,eio(seg(t,7.2,CUT0)));
+  else if(t<CUT1) s=sTrack(lerp(U0,U1,seg(t,CUT0,CUT1)))+K;
+  else if(t<14.6) s=S_E;
+  else s=lerp(S_E,S_F,eio(seg(t,14.6,16.5)));
+  spin.rotation.z=s;
+
+  /* camera dolly */
+  scene.updateMatrixWorld(true);
+  const dolly=lerp(1,.56,w);
+  const uF = t<CUT0 ? U0 : (t<CUT1 ? lerp(U0,U1,seg(t,CUT0,CUT1)) : U1);
+  const front=spin.localToWorld(surfaceLocal(uF,.5,tmpV2)).multiplyScalar(w*.85).add(tmpV.set(0,.1*(1-w),0));
+  camera.position.copy(camDir0).multiplyScalar(baseDist*dolly).add(front);
+  camera.lookAt(front);
+  camera.updateMatrixWorld();
+
+  /* design: wireframe sketches in, metal fades up */
+  const draw=eout(seg(t,.1,1.7));
+  wires.forEach(o=>o.w.geometry.setDrawRange(0,Math.floor(o.n*draw/2)*2));
+  wireMat.opacity = draw*(1-seg(t,1.9,2.7))*.9;
+  const metalA=eio(seg(t,1.0,2.4));
+  for(const m of metalMats){ const tr=metalA<1; if(m.transparent!==tr){ m.transparent=tr; m.needsUpdate=true; } m.opacity=metalA; }
+  head.visible = metalA>0; beads.visible = true;
+
+  /* set: stones fly in */
+  const glintBoost = t<CUT0 ? .55 : (t<14.6 ? .25 : lerp(.25,1,seg(t,15,16.5)));
+  for(const st of stones){
+    const k=seg(t,st.t0,st.t0+st.dur);
+    st.mesh.visible = t>=st.t0;
+    if(k<1 && t>=st.t0){
+      const e=eout(k);
+      const S=spin.worldToLocal(tmpV.copy(st.start));
+      const C=tmpV2.copy(S).add(st.target).multiplyScalar(.5).add(st.swirl);
+      const a=(1-e)*(1-e), b=2*(1-e)*e, c=e*e;
+      st.mesh.position.set(S.x*a+C.x*b+st.target.x*c, S.y*a+C.y*b+st.target.y*c, S.z*a+C.z*b+st.target.z*c);
+      st.mesh.quaternion.copy(st.qFinal).multiply(tmpQ.setFromAxisAngle(st.axis,(1-e)*Math.PI*5));
+      st.mesh.scale.setScalar(st.size*lerp(1.8,1,e));
+    }else if(k>=1){
+      st.mesh.position.copy(st.target); st.mesh.quaternion.copy(st.qFinal); st.mesh.scale.setScalar(st.size);
+    }
+    // landing flash + ongoing twinkle
+    const land=st.t0+st.dur, fk=seg(t,land-.05,land+.45);
+    const fl=fk>0&&fk<1 ? Math.sin(fk*Math.PI) : 0;
+    const top=tmpV.copy(st.target).normalize().multiplyScalar(st.size*.45).add(st.target);
+    if(st.center) top.set(0,YG+RG*.4,0);
+    st.flash.position.copy(top); st.flash.scale.setScalar((st.center?1.0:.35)*fl+.001); st.flash.material.opacity=fl;
+    const tw=t>=land ? Math.pow(Math.max(0,Math.sin((t+idleT)*st.w+st.ph)),10)*glintBoost : 0;
+    st.glint.position.copy(top); st.glint.scale.setScalar((st.center?.34:.12)*tw+.001); st.glint.material.opacity=tw;
+  }
+  setProngs(1-eio(seg(t,6.55,7.1)));
+
+  /* engrave */
+  const cutK=seg(t,CUT0,CUT1);
+  const u = t<CUT0 ? U0 : lerp(U0,U1,cutK);
+  eng.uCursor.value = t<CUT0 ? 0 : (t>=CUT1 ? 1 : u);
+  eng.uGlow.value = (t>=CUT0 && t<CUT1+.6) ? 1-seg(t,CUT1,CUT1+.6) : 0;
+  const sweepK=seg(t,15.3,16.9);
+  eng.uSweep.value = lerp(U0-.06,U1+.06,eio(sweepK));
+  eng.uSweepAmt.value = sweepK>0&&sweepK<1 ? Math.sin(sweepK*Math.PI)*.75 : 0;
+
+  const toolIn=eio(seg(t,7.2,CUT0)), toolOut=eio(seg(t,CUT1,14.7));
+  graver.visible = t>7.2 && t<14.7;
+  if(graver.visible){
+    const rows=window.__cutRows[Math.min(window.__cutRows.length-1,Math.round(u*PW/2))]||[];
+    const target = rows.length ? rows[Math.floor(t*9)%rows.length] : PCY;
+    tipY += (target-tipY)*Math.min(1,dt*18 || 1);
+    const vpx = tipY;
+    const pL=surfaceLocal(u, 1-vpx/PH, tmpV);
+    const pW=spin.localToWorld(pL);
+    const nW=tmpV2.set(Math.cos(Math.PI/2+2*Math.PI*u),Math.sin(Math.PI/2+2*Math.PI*u),0).transformDirection(spin.matrixWorld);
+    const dir=nW.clone().multiplyScalar(.5).add(new THREE.Vector3(.85,.3,.1)).normalize();
+    const away=(1-toolIn)+toolOut;
+    graver.position.copy(pW).addScaledVector(dir, away*2.6 + .004*Math.sin(t*55));
+    graver.quaternion.setFromUnitVectors(new THREE.Vector3(1,0,0), dir);
+    graver.rotateX(.5);
+    const cutting=t>=CUT0 && t<CUT1;
+    tipLight.position.copy(pW).addScaledVector(nW,.08);
+    tipLight.intensity = cutting ? 2.2+Math.random()*1.4 : 0;
+    if(cutting && dt>0){
+      chipAcc+=dt*95;
+      while(chipAcc>=1){ chipAcc--; const c=chipState[chipIdx]; chipIdx=(chipIdx+1)%CH_N;
+        c.p.copy(pW); c.life=c.max=.35+Math.random()*.5;
+        c.v.copy(nW).multiplyScalar(.5+Math.random()*.6);
+        c.v.x+=(Math.random()-.2)*1.1; c.v.y+=Math.random()*1.1; c.v.z+=(Math.random()-.5)*.9; }
+    }
+  }else{ tipLight.intensity=0; }
+  // chips integrate
+  for(let i=0;i<CH_N;i++){ const c=chipState[i];
+    if(c.life>0){ c.life-=dt; c.v.y-=3.2*dt; c.p.addScaledVector(c.v,dt); }
+    const f=Math.max(0,c.life/c.max);
+    chipPos[i*3]=c.p.x; chipPos[i*3+1]=c.p.y; chipPos[i*3+2]=c.p.z;
+    chipCol[i*3]=f*1.0; chipCol[i*3+1]=f*.78; chipCol[i*3+2]=f*.45;
+  }
+  chipGeo.attributes.position.needsUpdate=true; chipGeo.attributes.color.needsUpdate=true;
+
+  /* finish: milgrain rolls in from the top of the ring */
+  const mk=t-15.0;
+  setBeads(d=>eout(clamp01((mk-d*1.5)/.3)));
+}
+
+/* ---------- sizing ---------- */
+function resize(){
+  const w=stageEl.clientWidth, h=stageEl.clientHeight;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h; camera.updateProjectionMatrix();
+  const k=2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
+  baseDist=Math.max(3.1/k, 3.0/(k*camera.aspect));
+}
+new ResizeObserver(resize).observe(stageEl); resize();
+
+/* ---------- playback + UI ---------- */
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let t=reduce?END:0, playing=!reduce, visible=true, last=performance.now();
+const chapEls=[...document.querySelectorAll('.chap')];
+const capEl=document.getElementById('caption');
+let curChap=-1;
+function ui(){
+  CHAPTERS.forEach((c,i)=>chapEls[i].style.setProperty('--p', seg(t,c.s,c.e).toFixed(3)));
+  const idx=Math.max(0,CHAPTERS.findLastIndex(c=>t>=c.s));
+  if(idx!==curChap){ curChap=idx; chapEls.forEach((el,i)=>el.classList.toggle('on',i===idx)); capEl.innerHTML='<strong>'+CHAPTERS[idx].k+'.</strong> '+CHAPTERS[idx].cap; }
+  stageEl.classList.toggle('can-drag', t>=END);
+}
+const playBtn=document.getElementById('play');
+function setPlaying(p){ playing=p; document.getElementById('ico-pause').hidden=!p; document.getElementById('ico-play').hidden=p; playBtn.setAttribute('aria-label',p?'Pause animation':'Play animation'); }
+setPlaying(playing);
+playBtn.addEventListener('click',()=>{ if(t>=END){ t=0; resetChips(); } setPlaying(!playing); });
+document.getElementById('replay').addEventListener('click',()=>{ t=0; dragYaw=0; resetChips(); setPlaying(true); });
+chapEls.forEach((el,i)=>el.addEventListener('click',()=>{ t=CHAPTERS[i].s+.001; resetChips(); setPlaying(true); }));
+
+// drag to turn once finished
+let dragging=false, lastX=0, vel=0;
+canvas.addEventListener('pointerdown',e=>{ if(t<END) return; dragging=true; lastX=e.clientX; vel=0; canvas.setPointerCapture(e.pointerId); stageEl.classList.add('dragging'); });
+canvas.addEventListener('pointermove',e=>{ if(!dragging) return; const dx=e.clientX-lastX; lastX=e.clientX; vel=dx*.008; dragYaw+=vel; });
+const endDrag=()=>{ dragging=false; stageEl.classList.remove('dragging'); };
+canvas.addEventListener('pointerup',endDrag); canvas.addEventListener('pointercancel',endDrag);
+
+new IntersectionObserver(es=>{ visible=es[0].isIntersecting; },{threshold:0}).observe(stageEl);
+
+function loop(now){
+  requestAnimationFrame(loop);
+  const dt=Math.min(.05,(now-last)/1000); last=now;
+  if(!visible || document.hidden) return;
+  let step=0;
+  if(playing && t<END){ t=Math.min(END,t+dt); step=dt; }
+  if(t>=END){ idleT+=dt; if(!dragging){ dragYaw+=vel; vel*=.94; } step=dt; }
+  update(t, step);
+  ui();
+  renderer.render(scene,camera);
+}
+window.ringSeek=v=>{ t=v; setPlaying(false); update(t,.016); ui(); renderer.render(scene,camera); };
+update(t,0); ui(); renderer.render(scene,camera);
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
