@@ -61,18 +61,35 @@ p{margin:0}
 .nav ul a:hover{color:#fff}
 @media (max-width:640px){.nav ul{gap:16px}.nav ul li.hide-sm{display:none}.brand span{display:none}}
 
-/* hero stage (always dark) */
-.hero{background:var(--stage);color:var(--stage-fg);overflow:hidden;position:relative}
-.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 55% at 50% 62%,rgba(216,182,115,.13),transparent 70%);pointer-events:none}
-.hero-copy{position:relative;text-align:center;padding-block:48px 0}
+/* hero: full-bleed engraving film (always dark) */
+.hero{position:relative;overflow:hidden;background:var(--stage);color:var(--stage-fg);min-height:clamp(560px,90vh,960px);display:flex;align-items:flex-end}
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:40% 50%}
+.hero-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.45) 42%,rgba(0,0,0,0) 70%),linear-gradient(0deg,rgba(0,0,0,.7) 0%,rgba(0,0,0,0) 45%);pointer-events:none}
+.hero-copy{position:relative;width:100%;padding-block:0 88px}
 .eyebrow{font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
-.hero .eyebrow{color:var(--gold-soft)}
-.hero h1{font-size:clamp(44px,7.4vw,84px);font-weight:700;line-height:1.02;margin-top:12px}
-.hero-sub{font-size:clamp(19px,2.3vw,24px);color:#a1a1a6;max-width:34ch;margin:18px auto 0;line-height:1.35;font-weight:500}
-.cta{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-top:22px;font-size:19px}
-.cta a{color:#e3c283;text-decoration:none}
+.hero .eyebrow,.process .eyebrow{color:var(--gold-soft)}
+.hero h1{font-size:clamp(48px,8vw,104px);font-weight:700;line-height:1;margin-top:12px;text-shadow:0 2px 30px rgba(0,0,0,.35)}
+.hero-sub{font-size:clamp(19px,2.3vw,24px);color:#e3e3e8;max-width:30ch;margin-top:18px;line-height:1.35;font-weight:500}
+.cta{display:flex;gap:28px;flex-wrap:wrap;margin-top:24px;font-size:19px}
+.cta a{color:#e8c98a;text-decoration:none}
 .cta a:hover{text-decoration:underline}
-.stage{position:relative;height:clamp(420px,66vh,740px);margin-top:-12px}
+.sound-btn{position:absolute;right:22px;bottom:26px;z-index:2;background:rgba(0,0,0,.45);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.hero-note{position:absolute;right:74px;bottom:36px;font-size:12px;color:rgba(245,245,247,.6);margin:0}
+@media (max-width:640px){.hero{min-height:88vh}.hero-copy{padding-block:0 96px}.hero-note{right:auto;left:22px;bottom:34px}}
+@media (min-width:900px){
+  .hero{align-items:center}
+  .hero-video{left:auto;right:0;width:70%;object-position:50% 50%}
+  .hero-shade{background:linear-gradient(90deg,#000 0%,#000 30%,rgba(0,0,0,.55) 40%,rgba(0,0,0,0) 54%),linear-gradient(0deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,0) 30%)}
+  .hero-copy{padding-block:0}
+  .hero-copy>*{max-width:460px}
+  .hero h1{font-size:clamp(52px,5.2vw,80px)}
+}
+/* 3D process section */
+.process{position:relative;background:var(--stage);color:var(--stage-fg);overflow:hidden;padding-top:100px}
+.process::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 55% at 50% 58%,rgba(216,182,115,.13),transparent 70%);pointer-events:none}
+.process-head{position:relative;text-align:center}
+.process h2{font-size:clamp(34px,5vw,56px);font-weight:700;line-height:1.05;margin-top:10px}
+.stage{position:relative;height:clamp(420px,66vh,740px);margin-top:8px}
 .stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:default}
 .stage.can-drag canvas{cursor:grab}
 .stage.dragging canvas{cursor:grabbing}
@@ -96,16 +113,6 @@ p{margin:0}
 .chap.on{color:#f5f5f7}
 @media (max-width:560px){.bench{grid-template-columns:1fr}.controls{order:-1}.chapters{gap:8px}.chap{font-size:12px}}
 
-
-/* craft film */
-.craft{background:var(--stage);color:var(--stage-fg);padding-block:90px 70px}
-.craft h2{font-size:clamp(34px,5vw,56px);font-weight:700;line-height:1.05;margin-top:10px;max-width:18ch}
-.craft .eyebrow{color:var(--gold-soft)}
-.craft .lead{color:#a1a1a6;font-size:19px;margin-top:16px;max-width:52ch}
-.craft-video{width:100%;aspect-ratio:16/9;border-radius:24px;margin-top:40px;background:#111;object-fit:cover}
-.craft-frame{position:relative}
-.sound-btn{position:absolute;right:38px;bottom:62px;z-index:2;background:rgba(0,0,0,.45);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-.craft-note{font-size:13px;color:#86868b;margin-top:12px}
 
 /* statement */
 .statement{padding-block:120px 40px}
@@ -202,13 +209,23 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 </nav>
 
 <header class="hero" id="top">
+  <video class="hero-video" id="craftVideo" src="video/engraving.mp4" poster="video/engraving.jpg" autoplay muted loop playsinline preload="auto" aria-label="Close-up of a hand engraver cutting a scroll pattern into a gold engagement ring"></video>
+  <div class="hero-shade"></div>
   <div class="wrap hero-copy">
     <div class="eyebrow">Carlin Design &amp; Engraving</div>
     <h1>Cut by hand.<br>Set by eye.</h1>
     <p class="hero-sub">Custom rings designed, set and hand engraved by Jason Carlin in Woodbridge, New Jersey.</p>
     <div class="cta"><a href="#visit">Start a custom ring ›</a><a href="#work">See the work ›</a></div>
   </div>
+  <button class="icon-btn sound-btn" id="sound" type="button" aria-label="Turn sound on"><svg viewBox="0 0 16 16"><path d="M2 6h2.5L8 3v10L4.5 10H2z"/><path id="snd-waves" d="M10.5 5.5a3.5 3.5 0 0 1 0 5M12 3.8a6 6 0 0 1 0 8.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" hidden/><path id="snd-x" d="M10.5 6l4 4m0-4l-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+  <p class="hero-note">Concept film styled on Jason's own work</p>
+</header>
 
+<section class="process" id="process" aria-label="How a custom ring comes together">
+  <div class="wrap process-head">
+    <div class="eyebrow">From sketch to finish</div>
+    <h2>How a Carlin ring comes together.</h2>
+  </div>
   <div class="stage" id="stage">
     <canvas id="gl" aria-label="3D animation of a custom ring being designed, set with diamonds and hand engraved at Jason Carlin's bench"></canvas>
     <div class="fallback"><img src="img/w3.jpg" alt="Hand-engraved yellow gold band with a leaf pattern"></div>
@@ -228,17 +245,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
     </div>
     <div class="chapters" id="chapters"></div>
   </div>
-</header>
-
-
-<section class="craft" aria-label="Hand engraving at the bench">
-  <div class="wrap">
-    <div class="eyebrow">By hand</div>
-    <h2>Every line is pushed through the gold by hand.</h2>
-    <p class="lead">A hardened steel graver, a steady palm and a vise that turns the ring into each cut. The metal peels away in tiny gold curls.</p>
-  </div>
-  <div class="wrap craft-frame"><button class="icon-btn sound-btn" id="sound" type="button" aria-label="Turn sound on"><svg viewBox="0 0 16 16"><path d="M2 6h2.5L8 3v10L4.5 10H2z"/><path id="snd-waves" d="M10.5 5.5a3.5 3.5 0 0 1 0 5M12 3.8a6 6 0 0 1 0 8.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" hidden/><path id="snd-x" d="M10.5 6l4 4m0-4l-4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><video class="craft-video" id="craftVideo" src="video/engraving.mp4" poster="video/engraving.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Close-up of a hand engraver cutting a scroll pattern into a gold engagement ring"></video>
-  <p class="craft-note">Concept film generated for this site, styled on Jason's own work.</p></div>
 </section>
 
 <section class="wrap statement">
